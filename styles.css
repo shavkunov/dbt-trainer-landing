@@ -54,7 +54,7 @@
 
   --ease:cubic-bezier(.22,1,.36,1);
   --breath:11s;                          /* вдох — пауза — выдох */
-  --air:clamp(84px,11vw,164px);
+  --air:clamp(70px,8vw,124px);
   --shell:min(1440px,calc(100% - clamp(1.5rem,7vw,7rem)));
   --shadow-soft:0 1px 2px rgba(31,29,26,.04),0 14px 34px -18px rgba(31,29,26,.2),
                 0 44px 90px -56px rgba(184,122,84,.4);
@@ -158,7 +158,7 @@ b,strong{font-weight:500}
 /* свет позади: с каждой попыткой разгорается */
 .r-glow{position:absolute;width:135%;height:120%;pointer-events:none;filter:blur(46px);
   background:radial-gradient(closest-side,rgba(240,201,155,.92),rgba(232,186,132,.3) 56%,transparent 78%);
-  animation:r-glow-steps 18s ease-in-out infinite}
+  animation:r-glow-steps 15.3s ease-in-out infinite}
 @keyframes r-glow-steps{
   0%,4%{opacity:.28;transform:scale(.86)}
   30%,37%{opacity:.5;transform:scale(1)}
@@ -184,7 +184,7 @@ b,strong{font-weight:500}
 .r-top{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:18px}
 /* все три варианта лежат в одной ячейке грида — карточка не прыгает */
 .r-take,.r-score{display:grid}
-.r-take i,.r-score i{grid-area:1/1;font-style:normal;animation:r-swap 18s ease-in-out infinite}
+.r-take i,.r-score i{grid-area:1/1;font-style:normal;animation:r-swap 15.3s ease-in-out infinite}
 .r-take i{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--mut)}
 .r-score{justify-items:end}
@@ -195,7 +195,7 @@ b,strong{font-weight:500}
    иначе карточка прыгает при смене попытки. */
 .r-quote{display:grid;align-items:center;min-height:6.2em;margin-bottom:22px}
 .r-quote p{grid-area:1/1;font-family:var(--ser);font-style:italic;font-size:19px;line-height:1.42;
-  color:var(--ink);animation:r-swap 18s ease-in-out infinite}
+  color:var(--ink);animation:r-swap 15.3s ease-in-out infinite}
 
 /* фраза и подпись сменяются с мягким размытием, каждая держится ~6 с */
 @keyframes r-swap{
@@ -205,16 +205,17 @@ b,strong{font-weight:500}
   33%{opacity:0;transform:translateY(-7px);filter:blur(4px)}
   100%{opacity:0;transform:translateY(7px);filter:blur(4px)}
 }
+/* задержки — трети цикла: 15.3 / 3 = 5.1 с на попытку */
 .r-take i:nth-child(1),.r-score i:nth-child(1),.r-quote p:nth-child(1){animation-delay:0s}
-.r-take i:nth-child(2),.r-score i:nth-child(2),.r-quote p:nth-child(2){animation-delay:-12s}
-.r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){animation-delay:-6s}
+.r-take i:nth-child(2),.r-score i:nth-child(2),.r-quote p:nth-child(2){animation-delay:-10.2s}
+.r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){animation-delay:-5.1s}
 
 /* семь критериев DEAR MAN: загораются по мере того, как ответ становится точнее */
 .r-segs{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
 .r-segs i{height:4px;background:var(--clay);opacity:.14}
-.r-segs .a{animation:seg-a 18s ease-in-out infinite}
-.r-segs .b{animation:seg-b 18s ease-in-out infinite}
-.r-segs .c{animation:seg-c 18s ease-in-out infinite}
+.r-segs .a{animation:seg-a 15.3s ease-in-out infinite}
+.r-segs .b{animation:seg-b 15.3s ease-in-out infinite}
+.r-segs .c{animation:seg-c 15.3s ease-in-out infinite}
 @keyframes seg-a{0%,3%{opacity:.14} 7%,96%{opacity:1} 100%{opacity:.14}}
 @keyframes seg-b{0%,36%{opacity:.14} 40%,96%{opacity:1} 100%{opacity:.14}}
 @keyframes seg-c{0%,69%{opacity:.14} 73%,96%{opacity:1} 100%{opacity:.14}}
@@ -241,20 +242,41 @@ h2 i{font-family:var(--ser);font-style:italic;font-weight:300;color:var(--clay);
 .pull::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
   background:linear-gradient(180deg,transparent,var(--clay),transparent)}
 
-/* шаги */
-.steps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:60px}
-.steps li{position:relative;background:var(--paper);backdrop-filter:blur(8px);
-  padding:30px 30px 34px;overflow:hidden;
-  transition:transform .6s var(--ease),background .6s var(--ease),box-shadow .6s var(--ease)}
-.steps li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:linear-gradient(180deg,transparent,var(--clay),transparent);opacity:.35;
-  transition:opacity .6s var(--ease)}
-.steps li:hover{transform:translateY(-5px);background:var(--paper-2);box-shadow:var(--shadow-soft)}
-.steps li:hover::before{opacity:1}
-.steps em{display:block;font-family:var(--mono);font-style:normal;font-size:11px;
-  letter-spacing:.2em;color:var(--clay-ink);margin-bottom:20px}
-.steps strong{display:block;font-size:19px;font-weight:500;margin-bottom:9px;line-height:1.2}
-.steps p{color:var(--mut);font-size:14.5px;line-height:1.6}
+/* ---------- четыре шага как pinned-сцена ----------
+   Базовое состояние (без JS, на мобильном, при reduced-motion) — обычный список.
+   Класс .pinned навешивает скрипт, и только тогда включается залипание. */
+.journey{padding:0}
+.journey-inner{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
+  gap:clamp(2rem,5vw,5rem);align-items:center;padding:var(--air) 0}
+.journey-side h2{margin-top:6px}
+.rail{display:flex;gap:9px;margin-top:clamp(28px,4vh,44px)}
+.rail b{display:block;width:46px;height:2px;background:rgba(31,29,26,.14);overflow:hidden}
+.rail i{display:block;height:100%;background:var(--clay);transform:scaleX(0);transform-origin:left}
+
+.chapters{list-style:none;display:grid;gap:18px}
+.chapter{position:relative;background:var(--paper);backdrop-filter:blur(8px);
+  padding:clamp(24px,3vw,34px)}
+.chapter::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,transparent,var(--clay),transparent);opacity:.4}
+.chapter em{display:block;font-family:var(--mono);font-style:normal;font-size:11px;
+  letter-spacing:.2em;color:var(--clay-ink);margin-bottom:16px}
+.chapter h3{font-size:clamp(1.3rem,1.1rem + .6vw,1.9rem);font-weight:300;margin-bottom:10px;
+  line-height:1.16}
+.chapter p{color:var(--soft);font-size:15.5px;line-height:1.62;max-width:44ch}
+
+/* Залипание: трек задаёт длину прокрутки, сцена держится на месте,
+   главы лежат в одной ячейке грида и сменяются кроссфейдом. */
+.journey.pinned .journey-track{height:340svh;position:relative}
+.journey.pinned .journey-stage{position:sticky;top:0;height:100svh;display:flex;
+  align-items:center;overflow:hidden}
+.journey.pinned .journey-inner{padding:0;width:var(--shell)}
+.journey.pinned .chapters{gap:0;min-height:20rem;align-content:center}
+.journey.pinned .chapter{grid-area:1/1;opacity:0;will-change:opacity,transform;
+  padding:clamp(32px,3.6vw,50px)}
+/* в залипании глава — крупный самостоятельный кадр, а не карточка из списка */
+.journey.pinned .chapter em{font-size:12.5px;margin-bottom:22px}
+.journey.pinned .chapter h3{font-size:clamp(1.7rem,1.2rem + 1.2vw,2.7rem);margin-bottom:16px}
+.journey.pinned .chapter p{font-size:17px;line-height:1.66}
 
 /* ---------- демо: сценарий и разбор ---------- */
 .demo-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);
@@ -443,10 +465,12 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
 
 /* ================= АДАПТИВ ================= */
 @media(max-width:1180px){
-  .steps,.mods{grid-template-columns:repeat(2,1fr)}
+  .mods{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:980px){
-  .hero-grid,.problem-grid,.demo-grid,.compare,.cta-grid,.safety-grid{grid-template-columns:1fr}
+  .hero-grid,.problem-grid,.demo-grid,.compare,.cta-grid,.safety-grid,
+  .journey-inner{grid-template-columns:1fr}
+  .rail{display:none}
   .hero{min-height:auto;padding-top:clamp(96px,13vh,130px)}
   /* Мобильный герой пересобран: сначала оффер словами, карточка после кнопок. */
   .stage{min-height:auto;margin-top:42px;justify-content:flex-start}
@@ -459,7 +483,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
   :root{--shell:calc(100% - 1.75rem)}
   body{font-size:16px}
   .hd nav{display:none}
-  .steps,.mods{grid-template-columns:1fr}
+  .mods{grid-template-columns:1fr}
   .hero-actions{flex-direction:column;align-items:stretch}
   .btn{justify-content:center}
   .bubble.you{margin-left:0}
