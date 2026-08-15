@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Опора — тренажёр навыков DBT</title>
 <meta name="description" content="Опора — тренажёр навыков DBT: жизненная ситуация, ролевой диалог или пошаговое упражнение, разбор по критериям навыка и пример более сильного ответа. Учебный продукт, не терапия." />
-<meta name="theme-color" content="#060607" />
+<meta name="theme-color" content="#EFE9E1" />
 <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
 <link rel="canonical" href="./" />
 
@@ -60,13 +60,19 @@
       </div>
 
       <div class="stage rv" style="transition-delay:.4s">
-        <div class="monolith" tabindex="0" role="img"
-             aria-label="Тёмный камень с тонкой щелью тёплого света, которая медленно расширяется и сужается">
-          <div class="rock"></div>
-          <div class="pool" aria-hidden="true"></div>
-          <div class="seam" aria-hidden="true">
-            <i class="bloom"></i><i class="halo"></i><i class="core"></i>
+        <div class="aperture" tabindex="0" role="img"
+             aria-label="Две опоры и тёплый просвет между ними: проём медленно раскрывается и сужается в ритме спокойного дыхания">
+          <div class="halo-back" aria-hidden="true"></div>
+          <div class="rays" aria-hidden="true"></div>
+          <div class="gate" aria-hidden="true">
+            <span class="pillar l"></span>
+            <span class="pillar r"></span>
+            <div class="seam">
+              <i class="bloom"></i><i class="halo"></i><i class="core"></i>
+            </div>
+            <div class="motes"><i></i><i></i><i></i><i></i><i></i></div>
           </div>
+          <div class="pool" aria-hidden="true"></div>
         </div>
 
         <div class="proof" aria-hidden="true">
@@ -353,13 +359,13 @@ addEventListener('scroll', function () {
   document.getElementById('hd').classList.toggle('solid', scrollY > 60);
 }, { passive: true });
 
-/* камень и сцена реагируют на курсор с разной скоростью — только на десктопе */
-var mono = document.querySelector('.monolith');
+/* проём слегка отзывается на курсор — только на десктопе */
+var ap = document.querySelector('.aperture');
 var reduce = matchMedia('(prefers-reduced-motion: reduce)');
 addEventListener('pointermove', function (e) {
-  if (innerWidth < 980 || reduce.matches || !mono) return;
+  if (innerWidth < 980 || reduce.matches || !ap) return;
   var x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
-  mono.style.transform = 'translate3d(' + (x * -14) + 'px,' + (y * -8) + 'px,0)';
+  ap.style.transform = 'translate3d(' + (x * -12) + 'px,' + (y * -7) + 'px,0)';
 }, { passive: true });
 
 /* Локальный демо-режим: форма ещё не подключена к сервису приёма (см. README).

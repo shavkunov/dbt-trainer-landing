@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#060607"/>
-  <!-- та же скошенная щель света, что в логотипе и кнопках -->
+  <rect width="64" height="64" fill="#EFE9E1"/>
+  <!-- та же скошенная щель, что в логотипе, маркерах и скосах кнопок -->
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F4E9D2"/>
-      <stop offset="0.7" stop-color="#E8C87A"/>
-      <stop offset="1" stop-color="#E8C87A" stop-opacity="0.15"/>
+      <stop offset="0" stop-color="#B87A54"/>
+      <stop offset="0.72" stop-color="#C99065"/>
+      <stop offset="1" stop-color="#B87A54" stop-opacity="0.2"/>
     </linearGradient>
   </defs>
   <path d="M30 10 L44 10 L34 54 L20 54 Z" fill="url(#g)"/>
