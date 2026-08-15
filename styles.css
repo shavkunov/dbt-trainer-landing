@@ -128,8 +128,10 @@ b,strong{font-weight:500}
 /* ================= ГЕРОЙ ================= */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;
   padding:clamp(110px,14vh,150px) 0 clamp(70px,10vh,110px)}
+/* width НЕ задаём: .hero-grid стоит на том же элементе, что и .wrap,
+   и с равной специфичностью перебил бы ширину контейнера — текст уехал бы к краю */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);
-  gap:clamp(2rem,5vw,5.5rem);align-items:center;width:100%}
+  gap:clamp(2rem,5vw,5.5rem);align-items:center}
 
 .eyebrow{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:11px;
   letter-spacing:.26em;text-transform:uppercase;color:var(--mut);margin-bottom:clamp(22px,3.4vh,38px)}
@@ -143,129 +145,81 @@ b,strong{font-weight:500}
 .disclaimer::before{content:"";flex:0 0 auto;width:2px;align-self:stretch;
   background:linear-gradient(180deg,var(--clay),transparent)}
 
-/* ---------- проём: тёплый свет в арке ----------
-   Та же идея просвета, но это дверь к свету, а не щель в камне.
-   Свет собран настоящим filter:blur — мягкое затухание без ступеней. */
-.stage{position:relative;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:min(64vh,560px)}
-.aperture{position:relative;width:min(320px,76%);height:min(56vh,470px);cursor:pointer;
-  display:flex;align-items:center;justify-content:center}
-.aperture:focus-visible{outline:none}
+/* ---------- аттракцион: «три попытки» ----------
+   Это и есть продукт: одна и та же фраза переписывается, критерии навыка
+   закрываются один за другим, оценка растёт, свет позади разгорается.
+   Цикл 18 с — по шесть секунд на попытку. Медленно намеренно.
+   Метафора просвета осталась: свет позади карточки и скос в форме щели. */
+.stage{position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:min(60vh,520px)}
+.rehearsal{position:relative;width:min(420px,100%);display:flex;align-items:center;
+  justify-content:center;transition:transform .8s var(--ease)}
 
-/* тёплое свечение позади арки — дышит */
-.halo-back{position:absolute;width:150%;height:120%;pointer-events:none;filter:blur(52px);
-  background:radial-gradient(closest-side,rgba(240,201,155,.85),rgba(240,201,155,.24) 54%,transparent 76%);
-  animation:halo-breathe var(--breath) ease-in-out infinite}
-@keyframes halo-breathe{
-  0%{transform:scale(.86);opacity:.6}
-  36%{transform:scale(1.1);opacity:1}
-  64%{transform:scale(1.1);opacity:1}
-  100%{transform:scale(.86);opacity:.6}
+/* свет позади: с каждой попыткой разгорается */
+.r-glow{position:absolute;width:135%;height:120%;pointer-events:none;filter:blur(46px);
+  background:radial-gradient(closest-side,rgba(240,201,155,.92),rgba(232,186,132,.3) 56%,transparent 78%);
+  animation:r-glow-steps 18s ease-in-out infinite}
+@keyframes r-glow-steps{
+  0%,4%{opacity:.28;transform:scale(.86)}
+  30%,37%{opacity:.5;transform:scale(1)}
+  63%,70%{opacity:.78;transform:scale(1.09)}
+  96%{opacity:.92;transform:scale(1.13)}
+  100%{opacity:.28;transform:scale(.86)}
+}
+/* тонкое кольцо ритма — отсылка к дыханию 4-7-8 из варианта A */
+.r-ring{position:absolute;width:112%;height:104%;border-radius:50%;pointer-events:none;
+  border:1px solid rgba(172,109,71,.22);animation:r-ring-breathe var(--breath) ease-in-out infinite}
+@keyframes r-ring-breathe{
+  0%{transform:scale(.9);opacity:.35}
+  36%{transform:scale(1.04);opacity:.8}
+  64%{transform:scale(1.04);opacity:.8}
+  100%{transform:scale(.9);opacity:.35}
 }
 
-/* медленные лучи из проёма */
-.rays{position:absolute;width:190%;height:190%;pointer-events:none;filter:blur(20px);opacity:.62;
-  background:conic-gradient(from 0deg,
-    transparent 0deg,rgba(232,186,132,.5) 6deg,transparent 13deg,
-    transparent 40deg,rgba(232,186,132,.36) 46deg,transparent 53deg,
-    transparent 92deg,rgba(232,186,132,.46) 98deg,transparent 105deg,
-    transparent 150deg,rgba(232,186,132,.32) 156deg,transparent 163deg,
-    transparent 210deg,rgba(232,186,132,.42) 216deg,transparent 223deg,
-    transparent 270deg,rgba(232,186,132,.32) 276deg,transparent 283deg,
-    transparent 320deg,rgba(232,186,132,.46) 326deg,transparent 333deg,transparent 360deg);
-  -webkit-mask-image:radial-gradient(closest-side,#000 18%,transparent 68%);
-  mask-image:radial-gradient(closest-side,#000 18%,transparent 68%);
-  animation:rays-turn 88s linear infinite}
-@keyframes rays-turn{to{transform:rotate(360deg)}}
-
-/* две опоры и просвет между ними ----------
-   На светлом фоне свету нужно от чего-то отделяться, иначе он не читается.
-   Опоры — глубокий шалфей: спокойный природный тон, а не траурный чёрный.
-   Проём буквально раскрывается и сужается вместе с дыханием. */
-.gate{position:relative;width:100%;height:100%;display:flex;justify-content:center}
-.pillar{position:absolute;top:0;bottom:0;width:43%;
-  background:linear-gradient(166deg,#546C5D 0%,#3B4F43 44%,#2C3A33 100%);
-  box-shadow:0 26px 60px -30px rgba(44,58,51,.65),0 80px 130px -80px rgba(44,58,51,.5);
-  animation:gate-breathe var(--breath) ease-in-out infinite}
-.pillar.l{left:0;--push:-9px;
-  border-radius:150px 34px 12px 12px / 210px 52px 12px 12px}
-.pillar.r{right:0;--push:9px;
-  border-radius:34px 150px 12px 12px / 52px 210px 12px 12px}
-/* тёплый отсвет на внутренних гранях — опоры освещены просветом */
-.pillar::after{content:"";position:absolute;top:0;bottom:0;width:34%;border-radius:inherit;
-  background:linear-gradient(90deg,transparent,rgba(240,201,155,.35))}
-.pillar.l::after{right:0}
-.pillar.r::after{left:0;transform:scaleX(-1)}
-@keyframes gate-breathe{
-  0%{transform:translateX(0)}
-  36%{transform:translateX(var(--push))}
-  64%{transform:translateX(var(--push))}
-  100%{transform:translateX(0)}
-}
-
-/* просвет — вертикальное ядро света внутри арки, три слоя */
-.seam{position:absolute;left:50%;top:6%;bottom:4%;width:0;transform:translateX(-50%);z-index:2}
-.seam i{position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);
-  animation:seam-breathe var(--breath) ease-in-out infinite;transition:width 1.6s var(--ease)}
-.seam .bloom{width:170px;filter:blur(42px);animation-delay:-.9s;
-  background:radial-gradient(closest-side,rgba(255,235,198,.95),rgba(245,214,166,.45) 56%,transparent 78%)}
-.seam .halo{width:30px;filter:blur(15px);animation-delay:-.45s;
-  background:linear-gradient(180deg,transparent 3%,rgba(255,240,212,.9) 28%,
-             #FFF7E4 58%,rgba(250,222,180,.8) 84%,transparent)}
-.seam .core{width:3px;filter:blur(.6px);
-  background:linear-gradient(180deg,transparent 5%,rgba(255,252,244,.9) 20%,
-             #FFFFFF 48%,rgba(255,243,220,.95) 78%,transparent)}
-@keyframes seam-breathe{
-  0%{transform:translateX(-50%) scaleX(.78);opacity:.65}
-  36%{transform:translateX(-50%) scaleX(1.18);opacity:1}
-  64%{transform:translateX(-50%) scaleX(1.18);opacity:1}
-  100%{transform:translateX(-50%) scaleX(.78);opacity:.65}
-}
-.aperture:hover .core,.aperture:focus-visible .core{width:5px}
-.aperture:hover .halo,.aperture:focus-visible .halo{width:52px}
-.aperture:hover .bloom,.aperture:focus-visible .bloom{width:270px}
-
-/* пылинки в свете — медленно всплывают, каждая в своём темпе */
-.motes{position:absolute;left:38%;right:38%;top:0;bottom:0;overflow:hidden;pointer-events:none;z-index:3}
-.motes i{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.9);
-  filter:blur(1.4px);opacity:0;animation:mote-rise linear infinite}
-.motes i:nth-child(1){left:22%;animation-duration:17s;animation-delay:-2s}
-.motes i:nth-child(2){left:64%;animation-duration:23s;animation-delay:-9s;width:3px;height:3px}
-.motes i:nth-child(3){left:44%;animation-duration:20s;animation-delay:-14s}
-.motes i:nth-child(4){left:76%;animation-duration:26s;animation-delay:-5s;width:5px;height:5px}
-.motes i:nth-child(5){left:8%;animation-duration:29s;animation-delay:-19s;width:3px;height:3px}
-@keyframes mote-rise{
-  0%{transform:translateY(105%) translateX(0);opacity:0}
-  14%{opacity:.9}
-  80%{opacity:.7}
-  100%{transform:translateY(-12%) translateX(14px);opacity:0}
-}
-
-/* световое пятно на «полу» под аркой */
-.pool{position:absolute;left:50%;bottom:-7%;width:150%;height:110px;transform:translateX(-50%);
-  pointer-events:none;filter:blur(30px);
-  background:radial-gradient(closest-side,rgba(240,201,155,.7),transparent 74%);
-  animation:halo-breathe var(--breath) ease-in-out infinite;animation-delay:-1.2s}
-
-/* карточка разбора — стоит в свете проёма */
-.proof{position:relative;z-index:4;width:min(330px,92%);margin-top:-64px;padding:22px 24px 24px;
+.r-card{position:relative;z-index:2;width:100%;padding:26px 28px 24px;
   background:var(--paper-2);backdrop-filter:blur(14px);box-shadow:var(--shadow-soft)}
-.proof::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+.r-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
   background:linear-gradient(180deg,transparent,var(--clay),transparent)}
-.proof .cap{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--mut);display:block;margin-bottom:12px}
-.proof .score{display:flex;align-items:baseline;gap:9px;margin-bottom:18px}
-.proof .score b{font-weight:200;font-size:38px;line-height:1;letter-spacing:-.03em}
-.proof .score u{text-decoration:none;font-size:15px;color:var(--mut)}
-.proof .score em{font-style:normal;font-size:13px;color:var(--clay-ink);margin-left:auto;
-  font-family:var(--mono)}
-.crit{margin-bottom:11px}
-.crit:last-child{margin-bottom:0}
-.crit span{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;
-  color:var(--mut);margin-bottom:5px}
-.crit span u{text-decoration:none;font-family:var(--mono);color:var(--ink)}
-.bar{height:3px;background:rgba(31,29,26,.1);overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--clay),var(--warm))}
+
+.r-top{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:18px}
+/* все три варианта лежат в одной ячейке грида — карточка не прыгает */
+.r-take,.r-score{display:grid}
+.r-take i,.r-score i{grid-area:1/1;font-style:normal;animation:r-swap 18s ease-in-out infinite}
+.r-take i{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mut)}
+.r-score{justify-items:end}
+.r-score i{font-weight:200;font-size:34px;line-height:1;letter-spacing:-.03em;color:var(--clay)}
+.r-score u{text-decoration:none;font-size:15px;color:var(--mut);font-weight:300}
+
+/* Высота зарезервирована под самый длинный вариант, короткие центрируются —
+   иначе карточка прыгает при смене попытки. */
+.r-quote{display:grid;align-items:center;min-height:6.2em;margin-bottom:22px}
+.r-quote p{grid-area:1/1;font-family:var(--ser);font-style:italic;font-size:19px;line-height:1.42;
+  color:var(--ink);animation:r-swap 18s ease-in-out infinite}
+
+/* фраза и подпись сменяются с мягким размытием, каждая держится ~6 с */
+@keyframes r-swap{
+  0%{opacity:0;transform:translateY(7px);filter:blur(4px)}
+  4%{opacity:1;transform:none;filter:blur(0)}
+  29%{opacity:1;transform:none;filter:blur(0)}
+  33%{opacity:0;transform:translateY(-7px);filter:blur(4px)}
+  100%{opacity:0;transform:translateY(7px);filter:blur(4px)}
+}
+.r-take i:nth-child(1),.r-score i:nth-child(1),.r-quote p:nth-child(1){animation-delay:0s}
+.r-take i:nth-child(2),.r-score i:nth-child(2),.r-quote p:nth-child(2){animation-delay:-12s}
+.r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){animation-delay:-6s}
+
+/* семь критериев DEAR MAN: загораются по мере того, как ответ становится точнее */
+.r-segs{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
+.r-segs i{height:4px;background:var(--clay);opacity:.14}
+.r-segs .a{animation:seg-a 18s ease-in-out infinite}
+.r-segs .b{animation:seg-b 18s ease-in-out infinite}
+.r-segs .c{animation:seg-c 18s ease-in-out infinite}
+@keyframes seg-a{0%,3%{opacity:.14} 7%,96%{opacity:1} 100%{opacity:.14}}
+@keyframes seg-b{0%,36%{opacity:.14} 40%,96%{opacity:1} 100%{opacity:.14}}
+@keyframes seg-c{0%,69%{opacity:.14} 73%,96%{opacity:1} 100%{opacity:.14}}
+.r-cap{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mut-2)}
 
 /* ================= СЕКЦИИ ================= */
 section{position:relative;padding:var(--air) 0}
@@ -484,8 +438,8 @@ footer .bg{position:absolute;left:50%;bottom:-16%;width:100vw;height:78%;transfo
   padding:12px 20px}
 .skip:focus{left:12px;top:12px}
 
-a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,
-.aperture:focus-visible .arch{outline:2px solid var(--clay-ink);outline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
+  outline:2px solid var(--clay-ink);outline-offset:3px}
 
 /* ================= АДАПТИВ ================= */
 @media(max-width:1180px){
@@ -494,10 +448,9 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,
 @media(max-width:980px){
   .hero-grid,.problem-grid,.demo-grid,.compare,.cta-grid,.safety-grid{grid-template-columns:1fr}
   .hero{min-height:auto;padding-top:clamp(96px,13vh,130px)}
-  /* Мобильный герой пересобран: сначала оффер словами, проём после кнопок. */
-  .stage{min-height:auto;margin-top:38px}
-  .aperture{width:min(230px,58%);height:min(34vh,300px)}
-  .proof{width:100%;margin-top:-40px}
+  /* Мобильный герой пересобран: сначала оффер словами, карточка после кнопок. */
+  .stage{min-height:auto;margin-top:42px;justify-content:flex-start}
+  .rehearsal{width:min(480px,100%)}
   .nums{grid-template-columns:1fr;border-top:0}
   .num{border-right:0;border-top:1px solid var(--line);padding-left:0}
   .fcols{grid-template-columns:1fr 1fr}
@@ -512,16 +465,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,
   .bubble.you{margin-left:0}
   .fcols{grid-template-columns:1fr}
   .fbot{flex-direction:column;gap:8px}
-  /* наслаивающиеся эффекты на мобильном выключены — удобство важнее */
-  .rays,.motes{display:none}
+  .r-card{padding:22px 22px 20px}
+  .r-quote p{font-size:17.5px}
+  .r-quote{min-height:8.6em}
 }
 
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
   .rv{opacity:1;transform:none}
-  .seam .core{width:3px}
-  .seam .halo{width:28px}
-  .seam .bloom{width:160px}
-  .motes{display:none}
+  /* без движения показываем сразу третью попытку — лучший вариант ответа */
+  .r-take i,.r-score i,.r-quote p{opacity:0;filter:none;transform:none}
+  .r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){opacity:1}
+  .r-segs .a,.r-segs .b,.r-segs .c{opacity:1}
+  .r-glow{opacity:.75}
 }

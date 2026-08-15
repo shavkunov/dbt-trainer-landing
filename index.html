@@ -60,27 +60,31 @@
       </div>
 
       <div class="stage rv" style="transition-delay:.4s">
-        <div class="aperture" tabindex="0" role="img"
-             aria-label="Две опоры и тёплый просвет между ними: проём медленно раскрывается и сужается в ритме спокойного дыхания">
-          <div class="halo-back" aria-hidden="true"></div>
-          <div class="rays" aria-hidden="true"></div>
-          <div class="gate" aria-hidden="true">
-            <span class="pillar l"></span>
-            <span class="pillar r"></span>
-            <div class="seam">
-              <i class="bloom"></i><i class="halo"></i><i class="core"></i>
-            </div>
-            <div class="motes"><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
-          <div class="pool" aria-hidden="true"></div>
-        </div>
+        <div class="rehearsal" role="img"
+             aria-label="Три попытки одного ответа. С каждой попыткой формулировка становится точнее, критериев навыка закрывается больше, оценка растёт с шести до двенадцати из четырнадцати.">
+          <span class="r-glow" aria-hidden="true"></span>
+          <span class="r-ring" aria-hidden="true"></span>
 
-        <div class="proof" aria-hidden="true">
-          <span class="cap">Разбор навыка</span>
-          <div class="score"><b>12</b><u>из 14</u><em>86%</em></div>
-          <div class="crit"><span>Описание факта <u>2/2</u></span><div class="bar"><i style="width:100%"></i></div></div>
-          <div class="crit"><span>Чёткий отказ <u>2/2</u></span><div class="bar"><i style="width:100%"></i></div></div>
-          <div class="crit"><span>Подкрепление <u>1/2</u></span><div class="bar"><i style="width:50%"></i></div></div>
+          <div class="r-card" aria-hidden="true">
+            <div class="r-top">
+              <span class="r-take"><i>Попытка 1</i><i>Попытка 2</i><i>Попытка 3</i></span>
+              <span class="r-score"><i>6<u>/14</u></i><i>10<u>/14</u></i><i>12<u>/14</u></i></span>
+            </div>
+
+            <div class="r-quote">
+              <p>Ну… ладно, я посмотрю, что можно сделать.</p>
+              <p>Я не смогу, у меня планы на выходные.</p>
+              <p>Игорь, я слышу, что тебе нужно успеть. В эти выходные не смогу — у меня планы. В понедельник в девять помогу расставить приоритеты.</p>
+            </div>
+
+            <div class="r-segs">
+              <i class="a"></i><i class="a"></i><i class="a"></i>
+              <i class="b"></i><i class="b"></i>
+              <i class="c"></i>
+              <i class="d"></i>
+            </div>
+            <span class="r-cap">Критерии навыка DEAR MAN</span>
+          </div>
         </div>
       </div>
     </div>
@@ -359,13 +363,13 @@ addEventListener('scroll', function () {
   document.getElementById('hd').classList.toggle('solid', scrollY > 60);
 }, { passive: true });
 
-/* проём слегка отзывается на курсор — только на десктопе */
-var ap = document.querySelector('.aperture');
+/* карточка попытки слегка отзывается на курсор — только на десктопе */
+var reh = document.querySelector('.rehearsal');
 var reduce = matchMedia('(prefers-reduced-motion: reduce)');
 addEventListener('pointermove', function (e) {
-  if (innerWidth < 980 || reduce.matches || !ap) return;
+  if (innerWidth < 980 || reduce.matches || !reh) return;
   var x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
-  ap.style.transform = 'translate3d(' + (x * -12) + 'px,' + (y * -7) + 'px,0)';
+  reh.style.transform = 'translate3d(' + (x * -10) + 'px,' + (y * -6) + 'px,0)';
 }, { passive: true });
 
 /* Локальный демо-режим: форма ещё не подключена к сервису приёма (см. README).
