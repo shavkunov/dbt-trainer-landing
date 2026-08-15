@@ -1,0 +1,826 @@
+/* Токены и часть классов (.panel, .btn, .chat, .bubble, .criterion, .stat, .notice)
+   намеренно совпадают с dbt_trainer/frontend/src/app/globals.css — лендинг и приложение
+   должны выглядеть как один продукт. */
+
+:root {
+  --bg: #f3efe6;
+  --bg-deep: #e7dfd0;
+  --ink: #1c241c;
+  --muted: #5b6458;
+  --accent: #2f6b4f;
+  --accent-soft: #d7ebe0;
+  --warm: #b4783c;
+  --danger: #8b3a3a;
+  --card: rgba(255, 252, 246, 0.86);
+  --line: rgba(28, 36, 28, 0.12);
+  --shadow: 0 18px 50px rgba(40, 50, 35, 0.08);
+  --radius: 18px;
+  /* Без внешних шрифтов: системный serif/sans-стек. Самохостинг Fraunces/Source Sans —
+     отдельная задача полировки (см. README), не блокирует контент и деплой. */
+  --font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-body: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: var(--font-body);
+  /* clip (а не hidden) — не создаёт scroll-контейнер, поэтому full-bleed фоны
+     на 100vw не дают горизонтальной прокрутки и не ломают position: sticky. */
+  overflow-x: clip;
+}
+
+/* Mesh-градиент рисуется на всю ширину окна и «привязан» к верху страницы, а не
+   к контейнеру: на широком экране нет бежевых полей и эффекта коробки. */
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(closest-side, rgba(47, 107, 79, 0.3), transparent),
+    radial-gradient(closest-side, rgba(180, 120, 60, 0.24), transparent),
+    radial-gradient(closest-side, rgba(215, 235, 224, 0.6), transparent);
+  background-size: 60vw 620px, 52vw 560px, 74vw 720px;
+  background-position: -10vw -180px, right -8vw top -160px, 52% -260px;
+  background-repeat: no-repeat;
+}
+
+/* Лёгкое зерно поверх всей страницы — убирает "цифровую" плоскость у градиентов.
+   Данные встроены как data-URI: без внешних запросов и без CDN. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Фон секции — во всю ширину окна, контент остаётся в контейнере. */
+.bleed {
+  position: relative;
+}
+
+.bleed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+a {
+  color: inherit;
+}
+
+a:not(.btn) {
+  color: var(--accent);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.6em;
+}
+
+p {
+  line-height: 1.55;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--ink);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 10px 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.shell {
+  width: min(1440px, calc(100% - clamp(1.5rem, 7vw, 7rem)));
+  margin: 0 auto;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.stack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 1.08rem;
+  max-width: 42rem;
+}
+
+.note {
+  font-size: 0.92rem;
+}
+
+.notice {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.9rem;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+/* —— Header —— */
+
+.site-header {
+  padding: 1.25rem 0;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: -0.02em;
+}
+
+/* —— Buttons / fields (совпадают с приложением) —— */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.15rem;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background: #fff;
+  color: var(--ink);
+}
+
+/* —— Hero —— */
+
+.hero {
+  position: relative;
+  padding: clamp(1.5rem, 3.5vw, 3.5rem) 0 clamp(2rem, 4vw, 4rem);
+}
+
+.hero-grid {
+  display: grid;
+  /* minmax(0,…) — иначе длинные слова распирают колонку сверх её доли */
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  min-height: min(58vh, 540px);
+}
+
+.hero h1 {
+  /* Пологий наклон: на средних ширинах кегль не перерастает свою колонку,
+     на большом экране всё равно доходит до 4.7rem. */
+  font-size: clamp(2.3rem, 0.85rem + 3.05vw, 4.7rem);
+  max-width: 18ch;
+}
+
+.hero-actions {
+  margin: 1.6rem 0 1rem;
+}
+
+.micro-notice {
+  color: var(--muted);
+  font-size: 0.88rem;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.9rem;
+  max-width: 42rem;
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.floating-card {
+  width: min(440px, 100%);
+  padding: clamp(1.25rem, 2vw, 1.9rem);
+  transform: rotate(-2.5deg);
+  box-shadow: 0 34px 70px rgba(40, 50, 35, 0.18);
+}
+
+.floating-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0.4rem 0 1.25rem;
+}
+
+.floating-score {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 3.4vw, 3.4rem);
+  line-height: 1;
+}
+
+.floating-score span {
+  font-size: 0.42em;
+  color: var(--muted);
+  font-family: var(--font-body);
+}
+
+.floating-pct {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.mini-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.mini-rows li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.mini-rows b {
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-bar {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(28, 36, 28, 0.08);
+  overflow: hidden;
+}
+
+.mini-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+/* —— Problem: текст + крупная цитата рядом, а не сплошной вертикальный блок —— */
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.pull-quote {
+  margin: 0;
+  padding: clamp(1.5rem, 2.5vw, 2.5rem) clamp(1.75rem, 3vw, 3rem);
+  border-left: 4px solid var(--accent);
+  background: var(--card);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 0.9rem + 1.3vw, 2.2rem);
+  line-height: 1.3;
+}
+
+/* —— Sections —— */
+
+.section {
+  padding: clamp(2.75rem, 5.5vw, 5.5rem) 0;
+}
+
+.section h2 {
+  font-size: clamp(1.6rem, 1rem + 1.8vw, 2.7rem);
+  max-width: 20ch;
+}
+
+.lead {
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.25rem);
+}
+
+/* Та же mesh-палитра, что в hero, но заметно тише — цветной бэнд во всю ширину окна
+   под ключевой секцией с примером разбора. */
+#demo::before {
+  background:
+    radial-gradient(38% 80% at 88% -10%, rgba(47, 107, 79, 0.11), transparent 65%),
+    radial-gradient(34% 65% at 6% 110%, rgba(180, 120, 60, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(215, 235, 224, 0.28), rgba(215, 235, 224, 0.06));
+}
+
+/* —— Steps —— */
+
+.steps {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.steps li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+}
+
+.step-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.steps strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.steps p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* —— Demo (сценарий + разбор) —— */
+
+.demo-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+.eyebrow {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.demo-scenario h3,
+.demo-eval h3 {
+  margin-top: 0.1rem;
+}
+
+.chat {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.bubble {
+  max-width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 16px;
+  line-height: 1.45;
+  font-size: 0.95rem;
+}
+
+.bubble.user {
+  margin-left: 10%;
+  background: var(--accent);
+  color: white;
+}
+
+.bubble.assistant {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.demo-eval .stat {
+  padding: 1rem;
+  border-radius: 14px;
+  background: rgba(47, 107, 79, 0.08);
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.demo-eval .stat strong {
+  font-size: 1.6rem;
+  font-family: var(--font-display);
+}
+
+.criterion {
+  border-top: 1px solid var(--line);
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.criterion p {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.demo-eval > p {
+  margin-top: 0.9rem;
+  font-size: 0.94rem;
+}
+
+/* —— Cards (модули) —— */
+
+.cards-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.3rem;
+}
+
+.card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.card h3 {
+  margin-bottom: 0.35rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+/* —— Compare —— */
+
+.compare {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.compare-muted {
+  background: rgba(28, 36, 28, 0.04);
+}
+
+.compare-accent {
+  background: linear-gradient(160deg, #2f6b4f 0%, #1c241c 100%);
+  border-color: transparent;
+  color: #f8f4eb;
+}
+
+.compare-accent h3 {
+  color: #f8f4eb;
+}
+
+.clean-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.clean-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.clean-list li:last-child {
+  border-bottom: none;
+}
+
+.compare-accent .clean-list li {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.callout {
+  margin-top: 1.2rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2f6b4f, #1c241c);
+  color: #f8f4eb;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+
+/* —— Safety —— */
+
+.safety-section::before {
+  background: rgba(139, 58, 58, 0.05);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.safety-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: clamp(1rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.safety-grid h2 {
+  margin-bottom: 0;
+}
+
+.safety-section h2 {
+  color: var(--danger);
+}
+
+/* —— FAQ —— */
+
+.faq-list {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.faq-list details {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+}
+
+.faq-list summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.faq-list p {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+}
+
+/* —— CTA / форма —— */
+
+.cta-section {
+  padding-bottom: clamp(3rem, 6vw, 6rem);
+}
+
+.cta-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.cta-grid h2 {
+  margin-bottom: 0;
+}
+
+.waitlist-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-label .label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.checkbox-row input {
+  margin-top: 0.2rem;
+}
+
+.form-note {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* —— Footer —— */
+
+.site-footer {
+  padding: 2rem 0 3rem;
+  border-top: 1px solid var(--line);
+}
+
+/* —— Animation —— */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: rise 420ms ease both;
+}
+
+/* —— Focus visibility (доступность) —— */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* —— Responsive —— */
+
+@media (min-width: 1000px) {
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .faq-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem 1.25rem;
+  }
+}
+
+/* Широкий экран: раскладки становятся шире и плотнее, а не «столбик по центру». */
+@media (min-width: 1360px) {
+  .faq-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .demo-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+}
+
+@media (max-width: 980px) {
+  .cta-grid,
+  .safety-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .demo-grid,
+  .compare,
+  .hero-grid,
+  .problem-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-grid {
+    min-height: 0;
+    gap: 2rem;
+  }
+
+  .hero-visual {
+    order: -1;
+    justify-content: flex-start;
+  }
+
+  .floating-card {
+    width: min(330px, 100%);
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    width: calc(100% - 1.75rem);
+  }
+
+  .hero {
+    padding: 2rem 0 1.5rem;
+  }
+
+  .hero h1 {
+    max-width: none;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .bubble.user {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .rise {
+    animation: none;
+  }
+}

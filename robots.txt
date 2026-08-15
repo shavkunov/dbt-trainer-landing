@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# TODO: раскомментировать и подставить реальный домен после деплоя (см. README.md, "Домен").
+# Sitemap: https://<owner>.github.io/dbt-trainer-landing/sitemap.xml
