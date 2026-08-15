@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D · Тихая роскошь — типографика вместо эффектов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF8F5; --ink:#16150F; --mut:#6E6A5F; --line:rgba(22,21,15,.13); --acc:#7A6A4F;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Manrope","Segoe UI",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none}
+a{color:inherit}
+
+/* курсор-пятно света — единственный «эффект» на всю страницу */
+.spot{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,rgba(122,106,79,.13),transparent 62%);transform:translate(-50%,-50%);
+  transition:opacity .5s}
+.dot{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--ink);pointer-events:none;z-index:60;
+  transform:translate(-50%,-50%);transition:width .3s var(--ease),height .3s var(--ease),background .3s}
+.dot.big{width:44px;height:44px;background:rgba(22,21,15,.14);backdrop-filter:invert(4%)}
+@media(hover:none){body{cursor:auto}.spot,.dot{display:none}}
+
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.04;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.wrap{position:relative;z-index:3;max-width:1240px;margin:0 auto;padding:0 clamp(22px,5vw,64px)}
+
+header{position:fixed;top:0;left:0;right:0;z-index:40;padding:24px 0;mix-blend-mode:difference;color:#fff}
+header .wrap{display:flex;justify-content:space-between;align-items:center}
+.mark{font-family:var(--serif);font-size:21px;letter-spacing:.32em;text-transform:uppercase}
+.nav{display:flex;gap:34px;font-size:13px;letter-spacing:.06em}
+.nav a{text-decoration:none;opacity:.75;transition:opacity .4s}
+.nav a:hover{opacity:1}
+@media(max-width:760px){.nav{display:none}}
+
+/* ---------- герой: только шрифт, ничего больше ---------- */
+.hero{min-height:100svh;display:flex;align-items:flex-end;padding-bottom:min(11vh,110px);position:relative}
+.kicker{font-size:12px;letter-spacing:.36em;text-transform:uppercase;color:var(--mut);margin-bottom:min(6vh,52px)}
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(52px,12.6vw,206px);line-height:.86;letter-spacing:-.035em}
+h1 .l{display:block;overflow:hidden}
+h1 .l span{display:block;transform:translateY(102%);transition:transform 1.25s var(--ease)}
+.loaded h1 .l span{transform:none}
+h1 .l:nth-child(2) span{transition-delay:.1s}
+h1 .l:nth-child(3) span{transition-delay:.2s}
+h1 i{font-style:italic;color:var(--acc)}
+
+.hbot{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:min(7vh,62px);
+  padding-top:26px;border-top:1px solid var(--line);flex-wrap:wrap;
+  opacity:0;transform:translateY(20px);transition:1s var(--ease) .55s}
+.loaded .hbot{opacity:1;transform:none}
+.hbot p{max-width:38ch;color:var(--mut);font-size:16.5px;line-height:1.65}
+
+/* магнитная кнопка */
+.mag{position:relative;display:inline-flex;align-items:center;gap:14px;padding:19px 40px;border-radius:99px;
+  border:1px solid var(--ink);text-decoration:none;font-size:14.5px;letter-spacing:.05em;overflow:hidden;
+  transition:transform .35s var(--ease),color .45s var(--ease);white-space:nowrap}
+.mag::before{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleY(0);transform-origin:bottom;
+  transition:transform .55s var(--ease);z-index:-1}
+.mag:hover{color:var(--paper)}
+.mag:hover::before{transform:scaleY(1)}
+.mag span{position:relative}
+
+/* ---------- цифры, которые набираются ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));border-top:1px solid var(--line);margin-top:min(20vh,180px)}
+.stat{padding:44px 0 40px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(46px,6.4vw,92px);line-height:1;letter-spacing:-.02em}
+.stat u{text-decoration:none;display:block;margin-top:12px;font-size:13px;letter-spacing:.05em;color:var(--mut);max-width:22ch}
+
+/* ---------- строки-манифест, проявляются по одной ---------- */
+.manifest{padding:min(18vh,170px) 0}
+.line{font-family:var(--serif);font-weight:300;font-size:clamp(26px,4.4vw,62px);line-height:1.2;
+  padding:26px 0;border-bottom:1px solid var(--line);display:flex;gap:clamp(16px,4vw,54px);align-items:baseline;
+  opacity:.24;transition:opacity .9s var(--ease),color .9s var(--ease)}
+.line.on{opacity:1}
+.line em{font-family:var(--sans);font-style:normal;font-size:12px;letter-spacing:.24em;color:var(--mut);
+  flex:0 0 auto;transform:translateY(-.4em)}
+.line.on i{font-style:italic;color:var(--acc)}
+
+/* ---------- люди ---------- */
+.people{padding-bottom:min(18vh,160px)}
+.people h2{font-family:var(--serif);font-weight:300;font-size:clamp(30px,4.6vw,66px);margin-bottom:56px;line-height:1.06}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.p{background:var(--paper);padding:34px 26px 40px;transition:background .5s var(--ease)}
+.p:hover{background:#F3EFE8}
+.p .ava{width:60px;height:60px;border-radius:50%;margin-bottom:22px;
+  background:conic-gradient(from 210deg,#D6CDBA,#A99B7C,#7A6A4F,#D6CDBA)}
+.p h4{font-size:16px;font-weight:500;margin-bottom:4px}
+.p small{display:block;color:var(--mut);font-size:13px;margin-bottom:14px}
+.p p{font-size:14.5px;color:var(--mut);line-height:1.6}
+
+.final{text-align:center;padding:min(20vh,180px) 0 min(14vh,130px);border-top:1px solid var(--line)}
+.final h2{font-family:var(--serif);font-weight:300;font-size:clamp(40px,8vw,124px);line-height:.94;letter-spacing:-.03em;margin-bottom:52px}
+footer{padding:26px 0 40px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.badge{position:fixed;left:16px;bottom:16px;z-index:50;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:7px 13px;border-radius:99px;background:var(--ink);color:var(--paper)}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}h1 .l span{transform:none}.hbot{opacity:1;transform:none}.line{opacity:1}}
+</style>
+</head>
+<body>
+<div class="spot" id="spot"></div><div class="dot" id="dot"></div>
+<div class="grain"></div>
+<div class="badge">Вариант D · Тихая роскошь</div>
+
+<header><div class="wrap">
+  <div class="mark">Опора</div>
+  <nav class="nav"><a href="#">Метод</a><a href="#">Специалисты</a><a href="#">Цены</a><a href="#">Войти</a></nav>
+</div></header>
+
+<div class="hero"><div class="wrap" style="width:100%">
+  <div class="kicker">Психотерапия · с 2019 года</div>
+  <h1>
+    <span class="l"><span>Меньше</span></span>
+    <span class="l"><span>шума —</span></span>
+    <span class="l"><span>больше <i>себя</i></span></span>
+  </h1>
+  <div class="hbot">
+    <p>Мы не обещаем счастья за 5 сессий. Мы даём метод, замеряем результат и честно говорим, когда нужен не психолог, а врач.</p>
+    <a class="mag" href="#" data-mag><span>Записаться на первую встречу</span></a>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><b data-to="284">0</b><u>практикующих специалиста с проверенным дипломом</u></div>
+    <div class="stat"><b data-to="12" data-suf=" нед.">0</b><u>средняя длительность курса с измеримым результатом</u></div>
+    <div class="stat"><b data-to="6.2" data-dec="1">0</b><u>пункта — среднее снижение по шкале GAD-7</u></div>
+    <div class="stat"><b data-to="93" data-suf="%">0</b><u>находят своего специалиста с первой или второй попытки</u></div>
+  </div>
+</div>
+
+<div class="wrap manifest">
+  <div class="line"><em>01</em><div>Мы не лечим личность. Мы <i>убираем то, что мешает</i> ей работать.</div></div>
+  <div class="line"><em>02</em><div>Первая встреча — это <i>собеседование</i>, и собеседуете вы.</div></div>
+  <div class="line"><em>03</em><div>Каждые шесть недель мы <i>перепроверяем</i>, помогает ли то, что мы делаем.</div></div>
+  <div class="line"><em>04</em><div>Если не помогает — <i>меняем</i> подход, специалиста или направляем к врачу.</div></div>
+</div>
+
+<div class="wrap people">
+  <h2>Люди, а не аватарки<br>из фотостока</h2>
+  <div class="row">
+    <div class="p"><div class="ava"></div><h4>Марина Д.</h4><small>КПТ · тревожные расстройства · 11 лет</small><p>«Я не даю советов. Я помогаю вам увидеть, какое правило внутри вас сейчас работает против вас.»</p></div>
+    <div class="p"><div class="ava" style="background:conic-gradient(from 90deg,#C9CFC2,#8C9A82,#5B6A54,#C9CFC2)"></div><h4>Артём К.</h4><small>Схема-терапия · выгорание · 8 лет</small><p>«Выгорание — не слабость. Это счёт, который организм выставляет за режим, в котором вы жили.»</p></div>
+    <div class="p"><div class="ava" style="background:conic-gradient(from 320deg,#E0CFC2,#BFA189,#8A6C55,#E0CFC2)"></div><h4>Лия С.</h4><small>EMDR · травма · 14 лет</small><p>«Мы не будем разбирать то, к чему вы не готовы. Темп задаёте вы, я держу рамку.»</p></div>
+    <div class="p"><div class="ava" style="background:conic-gradient(from 150deg,#CFC9E0,#9A91BF,#655C8A,#CFC9E0)"></div><h4>Игорь В.</h4><small>ACT · сон и тревога · 6 лет</small><p>«Цель не в том, чтобы перестать тревожиться. В том, чтобы тревога перестала решать за вас.»</p></div>
+  </div>
+</div>
+
+<div class="final"><div class="wrap">
+  <h2>Начнём?</h2>
+  <a class="mag" href="#" data-mag><span>Подобрать специалиста</span></a>
+</div></div>
+
+<footer><div class="wrap"><span>© Опора — демо-макет, вымышленный бренд</span><span>Не является медицинской услугой</span></div></footer>
+
+<script>
+addEventListener('load',()=>document.body.classList.add('loaded'));
+
+/* курсор */
+const spot=document.getElementById('spot'),dot=document.getElementById('dot');
+let mx=innerWidth/2,my=innerHeight/2,sx=mx,sy=my;
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function follow(){sx+=(mx-sx)*.08;sy+=(my-sy)*.08;spot.style.left=sx+'px';spot.style.top=sy+'px';requestAnimationFrame(follow)})();
+document.querySelectorAll('a,button,.p').forEach(el=>{
+  el.addEventListener('pointerenter',()=>dot.classList.add('big'));
+  el.addEventListener('pointerleave',()=>dot.classList.remove('big'));
+});
+
+/* магнитные кнопки */
+document.querySelectorAll('[data-mag]').forEach(b=>{
+  b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();
+    b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.22}px,${(e.clientY-r.top-r.height/2)*.34}px)`});
+  b.addEventListener('pointerleave',()=>b.style.transform='');
+});
+
+/* строки-манифест */
+const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('on',e.isIntersecting)),
+  {threshold:.6,rootMargin:'-18% 0px -18% 0px'});
+document.querySelectorAll('.line').forEach(l=>io.observe(l));
+
+/* счётчики */
+const io2=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return; io2.unobserve(e.target);
+  const el=e.target,to=parseFloat(el.dataset.to),dec=+(el.dataset.dec||0),suf=el.dataset.suf||'';
+  const t0=performance.now(),D=1500;
+  (function tick(t){const k=Math.min(1,(t-t0)/D),e2=1-Math.pow(1-k,3);
+    el.textContent=(to*e2).toFixed(dec)+suf; if(k<1)requestAnimationFrame(tick)})(t0);
+}),{threshold:.5});
+document.querySelectorAll('.stat b').forEach(s=>io2.observe(s));
+</script>
+</body>
+</html>

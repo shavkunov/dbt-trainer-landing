@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>E · ПРОСВЕТ — метод арт-директора</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@200;300;400;500&family=Cormorant+Garamond:ital,wght@1,300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   КОНЦЕПЦИЯ: «ПРОСВЕТ»
+   Просвет — это и щель света между туч, и медицинский термин,
+   и разговорное «наступил просвет» об улучшении состояния.
+   Форма щели скошенного света прошивает всё: логотип, кнопки,
+   разделители, левый край карточек, футер.
+   Ровно то, что Герман делает с «резом» в Kiru.
+   ============================================================ */
+:root{
+  --void:#060607; --stone:#111317; --stone-2:#191C22;
+  --light:#F4E9D2; --glow:#E8C87A; --ink:#EDEAE4; --mut:rgba(237,234,228,.52);
+  --disp:"Onest","Segoe UI",system-ui,sans-serif;
+  --ser:"Cormorant Garamond",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --air:clamp(96px,13vw,180px);          /* «чем дороже проект — тем больше воздуха» */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--void);color:var(--ink);font-family:var(--disp);font-weight:300;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding:0 clamp(22px,4vw,56px)}
+
+/* зерно — маскирует артефакты и добавляет воспринимаемую резкость */
+.grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------------- ШАПКА ---------------- */
+header{position:fixed;top:0;left:0;right:0;z-index:50;padding:20px 0;transition:.6s var(--ease)}
+header.solid{background:rgba(6,6,7,.72);backdrop-filter:blur(16px)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:30px}
+.logo{display:flex;align-items:center;gap:11px;font-size:15px;letter-spacing:.3em;text-transform:uppercase;font-weight:400}
+/* логотип = сама метафора: скошенная щель света */
+.slit{width:13px;height:26px;background:linear-gradient(180deg,var(--glow),rgba(232,200,122,.15));
+  clip-path:polygon(38% 0,100% 0,62% 100%,0 100%)}
+nav{display:flex;gap:30px;font-size:14px;color:var(--mut)}
+nav a{color:inherit;text-decoration:none;transition:color .4s var(--ease)}
+nav a:hover{color:var(--ink)}
+@media(max-width:900px){nav{display:none}}
+
+/* ---------------- ГЕРОЙ: три слоя ----------------
+   Приём Германа: сцена генерируется ЦЕЛИКОМ (объект уже внутри),
+   затем объект дублируется и вырезается — и заголовок уходит ПОД него.
+   Слой 1 — сцена. Слой 2 — заголовок. Слой 3 — вырезанный объект.
+   Никакой тени под объектом: он должен быть встроен в пространство. */
+.hero{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center}
+
+.scene{position:absolute;inset:0;z-index:1}
+.scene .sky{position:absolute;inset:0;
+  background:
+    radial-gradient(80% 55% at 50% 40%,rgba(232,200,122,.14),transparent 62%),
+    radial-gradient(120% 70% at 50% 108%,rgba(244,233,210,.10),transparent 60%),
+    linear-gradient(180deg,#08090B 0%,#0D1014 46%,#05060700 100%),#060607}
+.scene .fog{position:absolute;inset:-10%;
+  background:radial-gradient(45% 30% at 30% 62%,rgba(200,210,220,.10),transparent 70%),
+             radial-gradient(40% 26% at 72% 70%,rgba(200,210,220,.07),transparent 70%);
+  filter:blur(24px);animation:fog 34s var(--ease) infinite alternate}
+@keyframes fog{to{transform:translate3d(5%,-3%,0) scale(1.12)}}
+/* каменистое основание */
+.scene .ground{position:absolute;left:0;right:0;bottom:0;height:44%;
+  background:
+    radial-gradient(60% 100% at 20% 100%,#1A1D22,transparent 70%),
+    radial-gradient(50% 90% at 62% 100%,#15181C,transparent 70%),
+    radial-gradient(70% 120% at 88% 100%,#101317,transparent 70%),
+    linear-gradient(180deg,transparent,#08090B 70%)}
+
+.title{position:relative;z-index:2;width:100%;text-align:center;pointer-events:none}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--mut);margin-bottom:clamp(20px,4vh,44px)}
+/* заголовок сжат: межбуквенное поджато, интерлиньяж 0.86, стремится к прямоугольнику */
+h1{font-weight:200;font-size:clamp(64px,17vw,268px);line-height:.86;letter-spacing:-.045em;
+  color:#E4DDD0;
+  text-shadow:0 0 90px rgba(232,200,122,.16)}
+
+/* вырезанный объект поверх заголовка */
+.cutout{position:absolute;left:50%;bottom:0;z-index:3;transform:translateX(-50%);
+  width:min(430px,58vw);height:74vh;pointer-events:auto}
+.monolith{position:absolute;inset:0;
+  background:linear-gradient(168deg,#20242B 0%,#14171C 38%,#0A0C0F 100%);
+  clip-path:polygon(21% 100%,17% 16%,49% 0,53% 0,84% 15%,80% 100%);
+  box-shadow:inset 0 0 120px rgba(0,0,0,.9)}
+/* щель света — визуальная константа всего сайта */
+.seam{position:absolute;left:50%;top:8%;bottom:0;width:3px;transform:translateX(-50%);
+  background:linear-gradient(180deg,rgba(244,233,210,0),var(--light) 22%,var(--glow) 78%,rgba(232,200,122,0));
+  box-shadow:0 0 24px 5px rgba(232,200,122,.45),0 0 90px 26px rgba(232,200,122,.16);
+  transition:width 1.1s var(--ease),box-shadow 1.1s var(--ease)}
+.cutout:hover .seam{width:16px;box-shadow:0 0 40px 12px rgba(232,200,122,.6),0 0 170px 60px rgba(232,200,122,.26)}
+.spill{position:absolute;left:50%;top:6%;width:2px;height:96%;transform:translateX(-50%);
+  background:radial-gradient(closest-side,rgba(232,200,122,.22),transparent 72%);
+  filter:blur(28px);transition:width 1.1s var(--ease)}
+.cutout:hover .spill{width:340px}
+
+.hbot{position:absolute;left:0;right:0;bottom:clamp(26px,6vh,58px);z-index:4}
+.hbot .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:34px;flex-wrap:wrap}
+.hbot p{max-width:36ch;color:var(--mut);font-size:16.5px;line-height:1.62}
+.hbot p b{color:var(--ink);font-weight:400}
+.acts{display:flex;gap:12px;align-items:center}
+
+/* кнопка наследует форму щели — скос слева и справа */
+.btn{position:relative;display:inline-flex;align-items:center;gap:12px;padding:17px 34px;
+  font:inherit;font-size:14.5px;letter-spacing:.01em;text-decoration:none;color:var(--void);
+  background:var(--light);border:0;cursor:pointer;overflow:hidden;
+  clip-path:polygon(11px 0,100% 0,calc(100% - 11px) 100%,0 100%);
+  transition:transform .45s var(--ease),background .45s var(--ease)}
+.btn:hover{transform:translateY(-2px);background:#FFF6E4}
+.btn.ghost{background:rgba(237,234,228,.07);color:var(--ink);backdrop-filter:blur(10px)}
+.btn.ghost:hover{background:rgba(237,234,228,.14)}
+.btn svg{flex:0 0 auto}                      /* иконка вектором, не символом с клавиатуры */
+
+/* прогрессивное размытие: герой растворяется в чистый #000 → бесшовный стык */
+.fade{position:absolute;left:0;right:0;bottom:0;height:32vh;z-index:5;pointer-events:none}
+.fade i{position:absolute;inset:0;backdrop-filter:blur(var(--b))}
+.fade i:nth-child(1){--b:1px;  -webkit-mask-image:linear-gradient(transparent 0%,#000 25%);mask-image:linear-gradient(transparent 0%,#000 25%)}
+.fade i:nth-child(2){--b:4px;  -webkit-mask-image:linear-gradient(transparent 25%,#000 50%);mask-image:linear-gradient(transparent 25%,#000 50%)}
+.fade i:nth-child(3){--b:12px; -webkit-mask-image:linear-gradient(transparent 50%,#000 75%);mask-image:linear-gradient(transparent 50%,#000 75%)}
+.fade i:nth-child(4){--b:32px; -webkit-mask-image:linear-gradient(transparent 75%,#000 95%);mask-image:linear-gradient(transparent 75%,#000 95%)}
+.fade u{position:absolute;inset:0;background:linear-gradient(180deg,transparent,#060607 88%)}
+
+/* ---------------- СЕКЦИИ ---------------- */
+section{padding:var(--air) 0;position:relative}
+/* лейбл-якорь: акцентная форма + слово, без буллитов и тире */
+.label{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--mut);margin-bottom:26px}
+.label b{width:9px;height:18px;background:var(--glow);
+  clip-path:polygon(38% 0,100% 0,62% 100%,0 100%);flex:0 0 auto}
+/* заголовок блока намеренно смещён — ломаем сетку, как делает арт-директор */
+h2{font-weight:200;font-size:clamp(32px,5.2vw,76px);line-height:.94;letter-spacing:-.035em;max-width:17ch}
+h2 i{font-family:var(--ser);font-style:italic;font-weight:300;color:var(--glow)}
+.offset{margin-left:clamp(0px,16vw,270px)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:24px;margin-top:72px}
+/* карточка: один способ выделения — заливка. без обводки И тени одновременно.
+   тень многослойная и с цветом, а не плоская серая. отступы слева/сверху равны. */
+.card{position:relative;background:var(--stone);padding:32px 32px 38px;overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.5),0 14px 34px -12px rgba(0,0,0,.72),0 40px 90px -40px rgba(232,200,122,.12);
+  transition:transform .6s var(--ease),background .6s var(--ease)}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,transparent,var(--glow),transparent);opacity:.34;transition:opacity .6s var(--ease)}
+.card:hover{transform:translateY(-6px);background:var(--stone-2)}
+.card:hover::before{opacity:1}
+.card em{font-family:var(--mono);font-style:normal;font-size:11px;letter-spacing:.2em;color:var(--glow);
+  display:block;margin-bottom:22px}
+.card h3{font-size:21px;font-weight:400;line-height:1.2;margin-bottom:12px}
+.card p{color:var(--mut);font-size:15px;line-height:1.66}
+
+/* крупное изображение во всю ширину — «большие изображения дают вау» */
+.bleed{position:relative;height:min(88vh,780px);overflow:hidden;background:#08090B}
+.bleed .scene2{position:absolute;inset:0;
+  background:
+    radial-gradient(46% 40% at 50% 52%,rgba(232,200,122,.20),transparent 66%),
+    radial-gradient(90% 60% at 50% 118%,#171A1F,transparent 62%),
+    linear-gradient(180deg,#060607,#0C0E12 52%,#060607)}
+.bleed .beam{position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);
+  background:linear-gradient(180deg,transparent,var(--light),transparent);
+  box-shadow:0 0 40px 14px rgba(232,200,122,.22);animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.55;transform:translateX(-50%) scaleX(1)}50%{opacity:1;transform:translateX(-50%) scaleX(3)}}
+.bleed .line{position:absolute;left:0;right:0;bottom:clamp(40px,9vh,90px);text-align:center}
+.bleed .line p{font-family:var(--ser);font-style:italic;font-size:clamp(24px,4vw,54px);line-height:1.2;
+  font-weight:300;color:#EFE7D6;max-width:22ch;margin:0 auto}
+
+/* цифры */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  border-top:1px solid rgba(237,234,228,.13)}
+.num{padding:44px 0 40px;border-right:1px solid rgba(237,234,228,.13)}
+.num:last-child{border-right:0}
+.num b{display:block;font-weight:200;font-size:clamp(42px,5.6vw,80px);line-height:1;letter-spacing:-.03em}
+.num u{text-decoration:none;display:block;margin-top:14px;font-size:13.5px;color:var(--mut);max-width:24ch;line-height:1.5}
+
+/* масштабный футер — подпись арт-директора */
+footer{position:relative;padding:var(--air) 0 44px;overflow:hidden;border-top:1px solid rgba(237,234,228,.1)}
+footer .bg{position:absolute;left:0;right:0;bottom:-14%;height:80%;
+  background:radial-gradient(50% 70% at 50% 100%,rgba(232,200,122,.13),transparent 68%)}
+footer .huge{position:relative;font-weight:200;font-size:clamp(56px,15vw,220px);line-height:.84;
+  letter-spacing:-.05em;color:rgba(237,234,228,.1);text-align:center;user-select:none}
+.fcols{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:34px;margin-top:-4vw}
+.fcols div h4{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--glow);margin-bottom:16px}
+.fcols div a{display:block;color:var(--mut);text-decoration:none;font-size:15px;line-height:2;transition:color .4s}
+.fcols div a:hover{color:var(--ink)}
+.fbot{position:relative;margin-top:64px;padding-top:24px;border-top:1px solid rgba(237,234,228,.1);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--mut)}
+
+.rv{opacity:0;transform:translateY(24px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.badge{position:fixed;left:16px;bottom:16px;z-index:70;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;padding:7px 12px;background:var(--light);color:var(--void)}
+
+/* мобилка: композиция героя пересобирается, наслаивающиеся анимации выключены */
+@media(max-width:760px){
+  .cutout{width:78vw;height:52vh}
+  h1{font-size:19vw}
+  .title{padding-bottom:26vh}
+  .hbot .wrap{flex-direction:column;align-items:stretch}
+  .acts{flex-direction:column}
+  .btn{justify-content:center}
+  .offset{margin-left:0}
+  .fade{height:26vh}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="badge">Вариант E · метод арт-директора</div>
+
+<header id="hd"><div class="wrap">
+  <div class="logo"><span class="slit"></span>Просвет</div>
+  <nav><a href="#method">Метод</a><a href="#who">Специалисты</a><a href="#price">Стоимость</a><a href="#">Войти</a></nav>
+</div></header>
+
+<div class="hero">
+  <!-- слой 1: сцена -->
+  <div class="scene"><div class="sky"></div><div class="fog"></div><div class="ground"></div></div>
+
+  <!-- слой 2: заголовок — уходит ПОД объект -->
+  <div class="title">
+    <div class="eyebrow">Психотерапия · доказательный подход</div>
+    <h1>ПРОСВЕТ</h1>
+  </div>
+
+  <!-- слой 3: вырезанный объект. без тени — он встроен в сцену -->
+  <div class="cutout">
+    <div class="monolith"></div>
+    <div class="spill"></div>
+    <div class="seam"></div>
+  </div>
+
+  <!-- прогрессивное размытие в чистый чёрный -->
+  <div class="fade"><i></i><i></i><i></i><i></i><u></u></div>
+
+  <div class="hbot"><div class="wrap">
+    <p><b>Наведите на камень.</b> Сначала щель едва заметна. Потом она становится проходом. Так это и работает — не сразу и не по щелчку.</p>
+    <div class="acts">
+      <a class="btn" href="#">Подобрать специалиста
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 12L12 3M12 3H5.5M12 3v6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      </a>
+      <a class="btn ghost" href="#method">Как устроен метод</a>
+    </div>
+  </div></div>
+</div>
+
+<section id="method">
+  <div class="wrap">
+    <div class="label"><b></b>Метод</div>
+    <h2 class="offset rv">Мы не «разбираем детство».<br>Мы находим <i>механизм</i><br>и разбираем его</h2>
+    <div class="cards">
+      <div class="card rv"><em>01 · Диагностика</em><h3>Замер, а не ощущение</h3><p>Валидированные шкалы GAD-7, PHQ-9, ISI на первой встрече. Результат остаётся у вас на руках.</p></div>
+      <div class="card rv" style="transition-delay:.08s"><em>02 · План</em><h3>12 недель с точками контроля</h3><p>Если через шесть недель нет сдвига — меняем подход, специалиста или направляем к врачу.</p></div>
+      <div class="card rv" style="transition-delay:.16s"><em>03 · Практика</em><h3>Семь минут в день</h3><p>Между сессиями — работа с конкретным механизмом, а не медитации «чтобы успокоиться».</p></div>
+      <div class="card rv" style="transition-delay:.24s"><em>04 · Повторный замер</em><h3>Динамика в цифрах</h3><p>Те же шкалы через 12 недель. Видно, что изменилось, а что нет.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="bleed">
+  <div class="scene2"></div>
+  <div class="beam"></div>
+  <div class="line"><p>«Стало легче» — это не результат.<br>Результат — это когда видно, насколько.</p></div>
+</div>
+
+<section id="who">
+  <div class="wrap">
+    <div class="label"><b></b>Цифры</div>
+    <div class="nums">
+      <div class="num"><b data-to="284">0</b><u>практикующих специалиста с подтверждённым образованием</u></div>
+      <div class="num"><b data-to="6.2" data-dec="1">0</b><u>пункта — среднее снижение по GAD-7 за курс</u></div>
+      <div class="num"><b data-to="93" data-suf="%">0</b><u>находят своего специалиста с первой или второй попытки</u></div>
+      <div class="num"><b data-to="50" data-suf=" мин">0</b><u>первая встреча. Не совпало — не оплачиваете</u></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="bg"></div>
+  <div class="wrap">
+    <div class="huge">ПРОСВЕТ</div>
+    <div class="fcols">
+      <div><h4>Продукт</h4><a href="#">Как это работает</a><a href="#">Специалисты</a><a href="#">Стоимость</a><a href="#">Приложение</a></div>
+      <div><h4>Помощь</h4><a href="#">Что такое КПТ</a><a href="#">Когда нужен врач</a><a href="#">Вопросы</a><a href="#">Поддержка</a></div>
+      <div><h4>Компания</h4><a href="#">О нас</a><a href="#">Для специалистов</a><a href="#">Исследования</a><a href="#">Контакты</a></div>
+      <div><h4>Начать</h4><a href="#">Пройти анкету</a><a href="#">Подобрать специалиста</a><a href="#">Записаться</a></div>
+    </div>
+    <div class="fbot"><span>© Просвет — демо-макет, вымышленный бренд</span><span>Не является медицинской услугой. При острых состояниях обратитесь к врачу</span></div>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),
+  {threshold:.16,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+addEventListener('scroll',()=>document.getElementById('hd').classList.toggle('solid',scrollY>60),{passive:true});
+
+const io2=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return; io2.unobserve(e.target);
+  const el=e.target,to=parseFloat(el.dataset.to),dec=+(el.dataset.dec||0),suf=el.dataset.suf||'';
+  const t0=performance.now(),D=1600;
+  (function t(n){const k=Math.min(1,(n-t0)/D),e2=1-Math.pow(1-k,3);
+    el.textContent=(to*e2).toFixed(dec)+suf; if(k<1)requestAnimationFrame(t)})(t0);
+}),{threshold:.5});
+document.querySelectorAll('.num b').forEach(n=>io2.observe(n));
+
+/* герой слегка реагирует на курсор — объект и сцена двигаются с разной скоростью */
+const cut=document.querySelector('.cutout'),scn=document.querySelector('.scene');
+addEventListener('pointermove',e=>{
+  if(innerWidth<760)return;
+  const x=(e.clientX/innerWidth-.5),y=(e.clientY/innerHeight-.5);
+  cut.style.transform=`translateX(-50%) translate3d(${x*-16}px,${y*-8}px,0)`;
+  scn.style.transform=`translate3d(${x*8}px,${y*5}px,0) scale(1.03)`;
+},{passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C · Карта состояния — интерактив вместо видео</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500&family=JetBrains+Mono:wght@400;500&family=Golos+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E11; --paper:#F2F0EB; --ink:#111114;
+  --acc:#4F46E5;      /* подменяется тестом */
+  --mut:rgba(242,240,235,.55);
+  --disp:"Unbounded","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --sans:"Golos Text",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+canvas{position:fixed;inset:0;z-index:0;display:block}
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.shell{position:relative;z-index:3;min-height:100svh;display:flex;flex-direction:column}
+
+/* ---- сетка Swiss: узкая колонка мета + широкая контента ---- */
+header{display:grid;grid-template-columns:220px 1fr;gap:40px;padding:26px clamp(20px,4vw,54px);
+  border-bottom:1px solid rgba(242,240,235,.13);align-items:baseline}
+.mark{font-family:var(--disp);font-weight:500;font-size:15px;letter-spacing:.02em}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--mut);display:flex;gap:28px;flex-wrap:wrap}
+.meta span b{color:var(--acc);font-weight:500;transition:color .8s var(--ease)}
+
+main{flex:1;display:grid;grid-template-columns:220px 1fr;gap:40px;padding:clamp(40px,8vh,110px) clamp(20px,4vw,54px) 60px}
+.side{font-family:var(--mono);font-size:11.5px;color:var(--mut);line-height:2}
+.side u{text-decoration:none;display:block;color:var(--paper)}
+.side hr{border:0;border-top:1px solid rgba(242,240,235,.15);margin:18px 0}
+
+h1{font-family:var(--disp);font-weight:300;font-size:clamp(36px,6.2vw,86px);line-height:1.02;letter-spacing:-.03em;max-width:16ch}
+h1 mark{background:none;color:var(--acc);transition:color .8s var(--ease)}
+.lede{margin-top:30px;max-width:52ch;color:var(--mut);font-size:17px;line-height:1.62}
+
+/* ---- мини-тест: три ответа меняют заголовок, цвет и поле частиц ---- */
+.probe{margin-top:52px;max-width:760px;border:1px solid rgba(242,240,235,.16);border-radius:4px;overflow:hidden;backdrop-filter:blur(6px);background:rgba(14,14,17,.5)}
+.probe .bar{display:flex;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  border-bottom:1px solid rgba(242,240,235,.16);color:var(--mut)}
+.probe .bar div{padding:11px 16px;border-right:1px solid rgba(242,240,235,.16);transition:.5s var(--ease)}
+.probe .bar div.act{background:var(--acc);color:#fff;transition:background .6s var(--ease)}
+.probe .body{padding:30px 26px 26px}
+.q{font-family:var(--disp);font-weight:300;font-size:clamp(20px,2.5vw,30px);line-height:1.22;margin-bottom:24px}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{border:1px solid rgba(242,240,235,.24);background:transparent;color:var(--paper);font:inherit;font-size:15px;
+  padding:12px 20px;border-radius:99px;cursor:pointer;transition:.35s var(--ease)}
+.opt:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-2px)}
+.result{display:none;padding:30px 26px 30px}
+.result.on{display:block;animation:fade .8s var(--ease)}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1}}
+.result .tag{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:14px;transition:color .8s var(--ease)}
+.result h3{font-family:var(--disp);font-weight:300;font-size:clamp(22px,3vw,36px);line-height:1.14;margin-bottom:14px}
+.result p{color:var(--mut);max-width:50ch;line-height:1.62}
+.scale{display:flex;gap:4px;margin:22px 0 26px}
+.scale i{height:5px;flex:1;background:rgba(242,240,235,.16);border-radius:2px;overflow:hidden;position:relative}
+.scale i.f::after{content:"";position:absolute;inset:0;background:var(--acc);transform-origin:left;
+  animation:grow .9s var(--ease) both;transition:background .8s var(--ease)}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.cta{display:inline-flex;align-items:center;gap:12px;padding:15px 28px;border-radius:99px;background:var(--acc);
+  color:#fff;text-decoration:none;font-size:15px;transition:.45s var(--ease)}
+.cta:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.again{margin-left:16px;background:none;border:0;color:var(--mut);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+
+footer{border-top:1px solid rgba(242,240,235,.13);padding:20px clamp(20px,4vw,54px);
+  font-family:var(--mono);font-size:11px;color:var(--mut);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.badge{position:fixed;right:16px;top:16px;z-index:20;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;padding:7px 12px;border-radius:99px;background:var(--paper);color:var(--ink)}
+@media(max-width:860px){header,main{grid-template-columns:1fr;gap:22px}.side{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="grain"></div>
+<div class="badge">Вариант C · Карта</div>
+
+<div class="shell">
+  <header>
+    <div class="mark">ОПОРА<span style="color:var(--mut)">/state</span></div>
+    <div class="meta">
+      <span>режим: <b id="mMode">наблюдение</b></span>
+      <span>узлов: <b id="mNodes">0</b></span>
+      <span>связность: <b id="mLink">0.00</b></span>
+      <span id="mHint">двигайте курсором по полю</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="side">
+      <u>01 / Диагностика</u>
+      <u>02 / Подбор</u>
+      <u>03 / Терапия</u>
+      <u>04 / Замер</u>
+      <hr>
+      GAD-7 · PHQ-9 · ISI<br>
+      12 недель<br>
+      онлайн, 50 мин
+      <hr>
+      Демо-макет.<br>Бренд вымышленный.
+    </div>
+
+    <div>
+      <h1 id="h1">Тревога — это не характер.<br>Это <mark id="hlKey">состояние</mark>, у которого есть карта</h1>
+      <p class="lede" id="lede">Ответьте на три вопроса — и увидите, в какой точке вы находитесь и что конкретно с этим делают. Без диагнозов и без «просто расслабьтесь».</p>
+
+      <div class="probe">
+        <div class="bar"><div id="s1" class="act">Вопрос 1</div><div id="s2">Вопрос 2</div><div id="s3">Вопрос 3</div><div id="s4" style="flex:1;border-right:0">Результат</div></div>
+        <div class="body" id="body">
+          <div class="q" id="q">Что сильнее всего мешает прямо сейчас?</div>
+          <div class="opts" id="opts"></div>
+        </div>
+        <div class="result" id="res">
+          <div class="tag" id="rTag"></div>
+          <h3 id="rTitle"></h3>
+          <div class="scale" id="rScale"></div>
+          <p id="rText"></p>
+          <div style="margin-top:28px">
+            <a class="cta" href="#">Подобрать специалиста <span>→</span></a>
+            <button class="again" id="again">пройти заново</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer><span>© Опора — демо-макет</span><span>Скрининг не заменяет консультацию специалиста</span></footer>
+</div>
+
+<script>
+/* ================= поле частиц: «карта состояния» ================= */
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W,H,pts=[],mouse={x:-9999,y:-9999},acc={r:79,g:70,b:229},tgt={r:79,g:70,b:229},calm=0,tCalm=0;
+function size(){const d=Math.min(devicePixelRatio||1,2);W=cv.width=innerWidth*d;H=cv.height=innerHeight*d;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);build()}
+function build(){
+  const n=Math.round(innerWidth*innerHeight/13000);
+  pts=Array.from({length:n},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*.34,vy:(Math.random()-.5)*.34,r:Math.random()*1.5+.5}));
+  document.getElementById('mNodes').textContent=n;
+}
+addEventListener('resize',size);
+addEventListener('pointermove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+addEventListener('pointerleave',()=>{mouse.x=mouse.y=-9999});
+
+function loop(){
+  // цвет и «спокойствие» плавно едут к целевым
+  acc.r+=(tgt.r-acc.r)*.03; acc.g+=(tgt.g-acc.g)*.03; acc.b+=(tgt.b-acc.b)*.03;
+  calm+=(tCalm-calm)*.02;
+  const A=`${acc.r|0},${acc.g|0},${acc.b|0}`;
+  document.documentElement.style.setProperty('--acc',`rgb(${A})`);
+
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  const LINK=118-calm*34, SPD=1-calm*.62;
+  let links=0;
+
+  for(const p of pts){
+    p.x+=p.vx*SPD; p.y+=p.vy*SPD;
+    if(p.x<0||p.x>innerWidth)p.vx*=-1;
+    if(p.y<0||p.y>innerHeight)p.vy*=-1;
+    // курсор мягко притягивает — «внимание»
+    const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy);
+    if(d<190){p.x+=dx/d*.55;p.y+=dy/d*.55}
+  }
+  ctx.lineWidth=1;
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<LINK){links++;ctx.strokeStyle=`rgba(${A},${(1-d/LINK)*.34})`;
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+  }
+  for(const p of pts){
+    const near=Math.hypot(mouse.x-p.x,mouse.y-p.y)<190;
+    ctx.fillStyle=near?`rgba(${A},.95)`:`rgba(242,240,235,.42)`;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r+(near?1:0),0,7);ctx.fill();
+  }
+  document.getElementById('mLink').textContent=(links/Math.max(1,pts.length)).toFixed(2);
+  requestAnimationFrame(loop);
+}
+size();loop();
+
+/* ================= мини-скрининг ================= */
+const Q=[
+ {q:'Что сильнее всего мешает прямо сейчас?',
+  a:[['Постоянное внутреннее напряжение',2],['Не могу заснуть или просыпаюсь разбитым',1],['Всё раздражает, срываюсь на близких',2],['Ничего не хочется, всё серое',3]]},
+ {q:'Как давно это длится?',
+  a:[['Пару недель',0],['Пару месяцев',1],['Больше полугода',2],['Сколько себя помню',3]]},
+ {q:'Что вы уже пробовали?',
+  a:[['Ничего — только собираюсь',1],['Читал, слушал подкасты',1],['Спорт, режим, дыхательные',0],['Был у психолога, не зашло',2]]}
+];
+const PROFILES=[
+ {max:3, tag:'Профиль A — острая перегрузка', col:[46,160,120], calm:.85,
+  title:'Ресурс просел, но система цела',
+  text:'Похоже на реакцию на конкретную нагрузку, а не на устойчивое расстройство. Такие состояния хорошо отвечают на короткий формат: 6–8 встреч + работа со сном и восстановлением. Это самый быстрый сценарий из возможных.'},
+ {max:6, tag:'Профиль B — затяжное напряжение', col:[201,162,39], calm:.5,
+  title:'Организм перестал выходить из режима тревоги',
+  text:'Когда напряжение держится месяцами, оно закрепляется телесно — и «взять себя в руки» перестаёт работать физиологически. Здесь нужен протокол на 12 недель с замерами: КПТ-методы плюс работа с телом и режимом сна.'},
+ {max:99, tag:'Профиль C — устойчивый паттерн', col:[221,86,72], calm:.18,
+  title:'Это уже не эпизод, а способ жить',
+  text:'Долгие и повторяющиеся состояния редко «рассасываются». Зато они хорошо картируются: мы начинаем с диагностической сессии и валидированных шкал, чтобы понять механизм, а не гадать. Первый шаг — увидеть картину целиком.'}
+];
+let step=0,score=0;
+const optsEl=document.getElementById('opts'),qEl=document.getElementById('q');
+function renderQ(){
+  qEl.textContent=Q[step].q;
+  optsEl.innerHTML='';
+  Q[step].a.forEach(([t,w])=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=t;
+    b.onclick=()=>{score+=w;step++;
+      document.querySelectorAll('.bar div').forEach((d,i)=>d.classList.toggle('act',i===Math.min(step,3)));
+      if(step<Q.length){renderQ()}else{finish()}};
+    optsEl.appendChild(b);
+  });
+}
+function finish(){
+  const P=PROFILES.find(p=>score<=p.max);
+  tgt={r:P.col[0],g:P.col[1],b:P.col[2]}; tCalm=P.calm;
+  document.getElementById('body').style.display='none';
+  document.getElementById('rTag').textContent=P.tag;
+  document.getElementById('rTitle').textContent=P.title;
+  document.getElementById('rText').textContent=P.text;
+  const filled=Math.max(1,Math.round((1-P.calm)*7));
+  document.getElementById('rScale').innerHTML=Array.from({length:7},(_,i)=>`<i class="${i<filled?'f':''}" style="--d:${i*.07}s"></i>`).join('');
+  document.getElementById('res').classList.add('on');
+  document.getElementById('h1').innerHTML='Вот ваша <mark>точка</mark><br>на карте';
+  document.getElementById('lede').textContent='Это не диагноз — это ориентир. Дальше подбираем специалиста, который работает именно с таким профилем.';
+  document.getElementById('mMode').textContent='профиль определён';
+  document.getElementById('mHint').textContent='поле подстроилось под ваш результат';
+}
+document.getElementById('again').onclick=()=>{
+  step=0;score=0;tgt={r:79,g:70,b:229};tCalm=0;
+  document.getElementById('res').classList.remove('on');
+  document.getElementById('body').style.display='';
+  document.querySelectorAll('.bar div').forEach((d,i)=>d.classList.toggle('act',i===0));
+  document.getElementById('h1').innerHTML='Тревога — это не характер.<br>Это <mark>состояние</mark>, у которого есть карта';
+  document.getElementById('lede').textContent='Ответьте на три вопроса — и увидите, в какой точке вы находитесь и что конкретно с этим делают. Без диагнозов и без «просто расслабьтесь».';
+  document.getElementById('mMode').textContent='наблюдение';
+  renderQ();
+};
+renderQ();
+</script>
+</body>
+</html>

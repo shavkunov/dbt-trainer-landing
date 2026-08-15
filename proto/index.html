@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 направления «вау»-лендинга для психологического стартапа</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Golos+Text:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111013;--paper:#F4F1EC;--mut:rgba(244,241,236,.58);--acc:#C9A227;
+ --serif:"Cormorant Garamond",Georgia,serif;--sans:"Golos Text",system-ui,sans-serif;--mono:"JetBrains Mono",monospace;
+ --ease:cubic-bezier(.22,1,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:var(--sans);padding:clamp(28px,6vw,72px);-webkit-font-smoothing:antialiased}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{max-width:1180px;margin:0 auto;position:relative}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--acc);margin-bottom:22px}
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(36px,6.4vw,82px);line-height:1.02;letter-spacing:-.025em;max-width:18ch}
+.lede{margin-top:26px;max-width:62ch;color:var(--mut);font-size:16.5px;line-height:1.65}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;margin-top:64px}
+a.card{display:block;text-decoration:none;color:inherit;border:1px solid rgba(244,241,236,.16);border-radius:16px;
+ padding:30px 26px 32px;transition:.5s var(--ease);position:relative;overflow:hidden;background:#141317}
+a.card:hover{transform:translateY(-6px);border-color:var(--acc);background:#181720}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:16px}
+.card h2{font-family:var(--serif);font-weight:300;font-size:30px;line-height:1.1;margin-bottom:12px}
+.card p{color:var(--mut);font-size:14.5px;line-height:1.6}
+.card ul{margin-top:18px;padding-left:0;list-style:none;font-family:var(--mono);font-size:11.5px;color:var(--mut);line-height:2}
+.card ul li::before{content:"— ";color:var(--acc)}
+.swatch{height:56px;border-radius:10px;margin-bottom:22px}
+.sA{background:linear-gradient(110deg,#EFE9E1,#B9C7AE 40%,#E8C9AE 75%,#CFD9DE)}
+.sB{background:linear-gradient(110deg,#0B0D0C,#2E4034 35%,#C9A227 72%,#F3EBDA)}
+.sC{background:linear-gradient(110deg,#0E0E11,#4F46E5 34%,#2EA078 66%,#DD5648)}
+.sD{background:linear-gradient(110deg,#FAF8F5,#D6CDBA 40%,#7A6A4F 78%,#16150F)}
+.sE{background:radial-gradient(60% 90% at 50% 50%,#F4E9D2 0%,#E8C87A 14%,#20242B 46%,#060607 82%)}
+@media(max-width:720px){a.card[href="E-prosvet.html"]{grid-template-columns:1fr!important}}
+.note{margin-top:58px;padding-top:26px;border-top:1px solid rgba(244,241,236,.14);font-size:13.5px;color:var(--mut);max-width:70ch;line-height:1.7}
+kbd{font-family:var(--mono);font-size:11.5px;background:rgba(244,241,236,.1);padding:2px 7px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="wrap">
+  <div class="kick">Прототипы · психологический стартап</div>
+  <h1>Пять разных ответов на вопрос «как сделать вау»</h1>
+  <p class="lede">Один и тот же продукт, одна и та же структура оффера — пять принципиально разных художественных стратегий. Прежде чем строить настоящий лендинг, нужно выбрать <em>одну</em>: они не смешиваются. Каждый прототип — самостоятельный HTML-файл без зависимостей, кроме Google Fonts.</p>
+
+  <div class="grid">
+    <a class="card" href="E-prosvet.html" style="grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:32px;align-items:center">
+      <div class="swatch sE" style="height:100%;min-height:190px;margin:0"></div>
+      <div>
+        <div class="tag">E · метод арт-директора ← новое</div>
+        <h2 style="font-size:38px">Просвет</h2>
+        <p>Собран по методу Германа Шарнина: концепция-метафора («просвет» — и щель света, и улучшение состояния) проведена через логотип, кнопки, разделители и карточки. Плюс главный приём канала — заголовок уходит <em>под</em> вырезанный объект, объект не отбрасывает тень, низ героя растворяется прогрессивным блюром в чистый чёрный.</p>
+        <ul style="display:flex;gap:26px;flex-wrap:wrap"><li>риск отпугнуть: низкий</li><li>сложность: средняя</li><li>вес: ~15 КБ</li><li>наведите на камень</li></ul>
+      </div>
+    </a>
+
+    <a class="card" href="A-breath.html">
+      <div class="swatch sA"></div>
+      <div class="tag">A · безопасный</div>
+      <h2>Дыхание</h2>
+      <p>Calm-tech. Живой градиентный фон дышит в ритме 4-7-8, текст проявляется медленно. «Вау» здесь — ощущение, что сайт снижает пульс, а не поднимает.</p>
+      <ul><li>риск отпугнуть: минимальный</li><li>сложность: низкая</li><li>вес: ~14 КБ</li></ul>
+    </a>
+
+    <a class="card" href="B-cinema.html">
+      <div class="swatch sB"></div>
+      <div class="tag">B · максимальный вау</div>
+      <h2>Кино на скролле</h2>
+      <p>Точная реализация метода из ролика: 4 кадра, «залипание» плашек, зерно-бумага, генеративный ambient. Сейчас кадры собраны на CSS — вместо них подставляются видео из Kling.</p>
+      <ul><li>риск отпугнуть: высокий</li><li>сложность: высокая</li><li>вес: ~18 КБ + видео</li></ul>
+    </a>
+
+    <a class="card" href="C-map.html">
+      <div class="swatch sC"></div>
+      <div class="tag">C · продуктовый</div>
+      <h2>Карта состояния</h2>
+      <p>Вау через интерактив, а не через картинку. Мини-скрининг из 3 вопросов перекрашивает всю страницу и поле частиц под ваш профиль. Заодно это лид-магнит.</p>
+      <ul><li>риск отпугнуть: средний</li><li>сложность: средняя</li><li>вес: ~16 КБ</li></ul>
+    </a>
+
+    <a class="card" href="D-quiet.html">
+      <div class="swatch sD"></div>
+      <div class="tag">D · премиальный</div>
+      <h2>Тихая роскошь</h2>
+      <p>Никаких видео и 3D. Гигантская антиква, курсор-пятно света, магнитные кнопки, набирающиеся цифры. Вау — от того, что всё сделано на миллиметры точно.</p>
+      <ul><li>риск отпугнуть: низкий</li><li>сложность: средняя</li><li>вес: ~13 КБ</li></ul>
+    </a>
+  </div>
+
+  <p class="note"><strong>Как смотреть.</strong> Открывайте на десктопе. В <kbd>B</kbd> обязательно прокрутите первый экран до конца и включите кнопку «♪ Звук» слева внизу — звук синтезируется прямо в браузере. В <kbd>C</kbd> поводите курсором по фону и пройдите три вопроса. В <kbd>D</kbd> наведитесь на кнопки. Все четыре уважают <kbd>prefers-reduced-motion</kbd>. Бренд «Опора» — вымышленный плейсхолдер, цифры демонстрационные.</p>
+</div>
+</body>
+</html>

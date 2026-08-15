@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B · Кино на скролле — метод 4 кадров</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Golos+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0D0C; --fog:#8FA0A4; --gold:#C9A227; --bone:#E9E4D9; --moss:#2E4034;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Golos Text","Segoe UI",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--bone);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ===== СЦЕНА: pinned-контейнер на 4 экрана скролла ===== */
+.cinema{height:420vh;position:relative}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+
+/* каждый «кадр» — это то, что в методе Владимира приходит из Kling видео.
+   здесь кадры собраны из CSS-градиентов, чтобы прототип был автономным. */
+.frame{position:absolute;inset:0;opacity:0;transition:opacity .05s linear;will-change:opacity,transform}
+.frame > .layer{position:absolute;inset:-8%;background-size:cover;background-position:center}
+
+/* кадр 1 — туман */
+#f1 .layer{background:
+  radial-gradient(120% 80% at 50% 78%,#1A2320 0%,transparent 60%),
+  radial-gradient(90% 60% at 30% 40%,rgba(143,160,164,.35),transparent 65%),
+  radial-gradient(90% 60% at 72% 55%,rgba(143,160,164,.22),transparent 62%),
+  linear-gradient(#0B0D0C,#141A18 55%,#0B0D0C)}
+#f1::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 45% at 50% 62%,rgba(233,228,217,.09),transparent 70%);animation:sway 18s ease-in-out infinite alternate}
+
+/* кадр 2 — тропа */
+#f2 .layer{background:
+  linear-gradient(178deg,rgba(11,13,12,.1),rgba(11,13,12,.85)),
+  conic-gradient(from 200deg at 50% 118%,#2E4034 0deg,#1B2620 40deg,#26332B 90deg,#141C18 140deg,#2E4034 180deg),
+  #141C18}
+#f2::after{content:"";position:absolute;left:50%;bottom:-6%;width:26%;height:78%;transform:translateX(-50%);
+  background:linear-gradient(to top,rgba(201,162,39,.30),rgba(201,162,39,.06) 45%,transparent 78%);
+  filter:blur(26px);clip-path:polygon(38% 100%,62% 100%,54% 0,46% 0)}
+
+/* кадр 3 — поляна */
+#f3 .layer{background:
+  radial-gradient(70% 55% at 50% 30%,rgba(233,228,217,.38),transparent 66%),
+  linear-gradient(180deg,#3A4A3C,#22301F 60%,#101613),
+  #101613}
+#f3::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(96deg,rgba(233,228,217,.055) 0 2px,transparent 2px 13px);
+  mask-image:radial-gradient(60% 60% at 50% 32%,#000,transparent 72%)}
+
+/* кадр 4 — свет */
+#f4 .layer{background:
+  radial-gradient(58% 52% at 50% 46%,#F3EBDA 0%,#D9C79B 26%,#8E7C4E 52%,#2A2A20 78%,#0B0D0C 100%)}
+#f4::after{content:"";position:absolute;inset:0;background:
+  conic-gradient(from 0deg at 50% 46%,transparent 0deg,rgba(255,247,224,.16) 18deg,transparent 40deg,rgba(255,247,224,.11) 78deg,transparent 110deg,rgba(255,247,224,.16) 190deg,transparent 220deg,rgba(255,247,224,.1) 300deg,transparent 340deg);
+  animation:rot 46s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes sway{to{transform:translate3d(4%,-3%,0) scale(1.08)}}
+
+/* виньетка + зерно поверх всего — приём «текстурной бумаги» из ролика */
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 88% at 50% 50%,transparent 42%,rgba(0,0,0,.72) 100%)}
+.grain{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.085;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scan{position:fixed;inset:0;z-index:39;pointer-events:none;opacity:.055;
+  background:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px)}
+
+/* ===== ПЛАШКИ, которые «вылетают» на каждом кадре ===== */
+.plates{position:absolute;inset:0;z-index:12;pointer-events:none}
+.plate{position:absolute;left:0;right:0;padding:0 clamp(24px,6vw,90px);opacity:0;transform:translateY(34px);
+  transition:opacity .7s var(--ease),transform .9s var(--ease)}
+.plate.on{opacity:1;transform:none}
+.plate .chapter{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.plate h2{font-family:var(--serif);font-weight:300;font-size:clamp(38px,6.6vw,96px);line-height:1;letter-spacing:-.015em;max-width:15ch}
+.plate p{margin-top:20px;max-width:44ch;color:rgba(233,228,217,.72);font-size:17px;line-height:1.6}
+#p1{top:50%;transform:translateY(calc(-50% + 34px));text-align:center}
+#p1.on{transform:translateY(-50%)}
+#p1 h2{max-width:none;margin:0 auto}
+#p1 p{margin-left:auto;margin-right:auto}
+#p2{bottom:16vh}
+#p3{top:18vh}
+#p4{top:50%;transform:translateY(calc(-50% + 34px));text-align:center;color:#1A1710}
+#p4.on{transform:translateY(-50%)}
+#p4 .chapter{color:#6B5A22}
+#p4 p{color:rgba(26,23,16,.72);margin-left:auto;margin-right:auto}
+#p4 h2{max-width:none;margin:0 auto}
+
+/* ===== HUD: прогресс-рельс и звук ===== */
+.rail{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:14px}
+.rail b{display:block;width:2px;height:46px;background:rgba(233,228,217,.2);position:relative;overflow:hidden;border-radius:2px}
+.rail b i{position:absolute;inset:0;background:var(--gold);transform:scaleY(0);transform-origin:top;transition:transform .3s linear}
+.hud{position:fixed;left:26px;bottom:26px;z-index:30;display:flex;gap:12px;align-items:center}
+.btn{border:1px solid rgba(233,228,217,.28);background:rgba(11,13,12,.4);color:var(--bone);border-radius:99px;
+  padding:9px 16px;font:inherit;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  backdrop-filter:blur(8px);transition:.4s var(--ease)}
+.btn:hover{background:var(--bone);color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#1A1710}
+.hint{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:30;font-size:11px;letter-spacing:.32em;
+  text-transform:uppercase;color:rgba(233,228,217,.5);transition:opacity .6s}
+.hint.hide{opacity:0}
+
+/* ===== контент после кино ===== */
+.after{position:relative;z-index:20;background:var(--ink);padding:min(18vh,150px) clamp(24px,6vw,90px) 90px}
+.after .in{max-width:1120px;margin:0 auto}
+.after h3{font-family:var(--serif);font-weight:300;font-size:clamp(30px,4.4vw,64px);line-height:1.14;max-width:20ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:rgba(233,228,217,.14);
+  margin-top:64px;border:1px solid rgba(233,228,217,.14)}
+.cell{background:var(--ink);padding:36px 28px 44px;transition:.5s var(--ease)}
+.cell:hover{background:#131715}
+.cell em{font-style:normal;font-family:var(--serif);font-size:34px;color:var(--gold);display:block;margin-bottom:16px}
+.cell h4{font-size:17px;font-weight:500;margin-bottom:8px}
+.cell p{color:rgba(233,228,217,.6);font-size:15px;line-height:1.6}
+.cta{margin-top:72px;display:inline-block;padding:18px 40px;border-radius:99px;background:var(--gold);color:#1A1710;
+  text-decoration:none;font-size:15px;letter-spacing:.03em;transition:.5s var(--ease)}
+.cta:hover{transform:translateY(-3px);box-shadow:0 20px 50px -22px var(--gold)}
+.foot{margin-top:90px;padding-top:28px;border-top:1px solid rgba(233,228,217,.12);font-size:12.5px;color:rgba(233,228,217,.45);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.badge{position:fixed;left:26px;top:22px;z-index:40;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:7px 13px;border-radius:99px;background:rgba(233,228,217,.9);color:var(--ink)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="badge">Вариант B · Кино на скролле</div>
+<div class="grain"></div><div class="scan"></div>
+
+<div class="cinema" id="cinema">
+  <div class="stage">
+    <div class="frame" id="f1"><div class="layer"></div></div>
+    <div class="frame" id="f2"><div class="layer"></div></div>
+    <div class="frame" id="f3"><div class="layer"></div></div>
+    <div class="frame" id="f4"><div class="layer"></div></div>
+    <div class="vignette"></div>
+
+    <div class="plates">
+      <div class="plate" id="p1">
+        <div class="chapter">Глава I — Туман</div>
+        <h2>Вы не сломаны.<br>Просто не видно дороги</h2>
+        <p>Это состояние знакомо каждому третьему взрослому. У него есть название, механизм и выход.</p>
+      </div>
+      <div class="plate" id="p2">
+        <div class="chapter">Глава II — Тропа</div>
+        <h2>Появляется направление</h2>
+        <p>Первые четыре встречи — не «копание в детстве». Это карта: что именно происходит с вашей нервной системой и почему сейчас.</p>
+      </div>
+      <div class="plate" id="p3">
+        <div class="chapter">Глава III — Поляна</div>
+        <h2>Становится тише</h2>
+        <p>Через 8–12 недель клиенты отмечают снижение тревоги по шкале GAD-7 в среднем на 6 пунктов.</p>
+      </div>
+      <div class="plate" id="p4">
+        <div class="chapter">Глава IV — Свет</div>
+        <h2>И вы снова<br>управляете днём</h2>
+        <p>Не «навсегда счастливы». Просто вы, у которого снова есть выбор.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rail" id="rail">
+  <b><i></i></b><b><i></i></b><b><i></i></b><b><i></i></b>
+</div>
+<div class="hud">
+  <button class="btn" id="sound" aria-pressed="false">♪ Звук</button>
+</div>
+<div class="hint" id="hint">Листайте вниз</div>
+
+<div class="after">
+  <div class="in">
+    <h3>Четыре главы — это не метафора, а протокол работы</h3>
+    <div class="grid">
+      <div class="cell"><em>01</em><h4>Диагностическая сессия</h4><p>Валидированные шкалы GAD-7, PHQ-9, ISI. Вы получаете результат на руки, а не «ощущение».</p></div>
+      <div class="cell"><em>02</em><h4>План на 12 недель</h4><p>С контрольными точками. Если через 6 недель нет сдвига — меняем подход или специалиста.</p></div>
+      <div class="cell"><em>03</em><h4>Практики между встречами</h4><p>7 минут в день в приложении. Не медитации «для успокоения», а работа с конкретным механизмом.</p></div>
+      <div class="cell"><em>04</em><h4>Повторный замер</h4><p>Те же шкалы через 12 недель. Динамика в цифрах, а не «стало полегче».</p></div>
+    </div>
+    <a class="cta" href="#">Пройти диагностику — бесплатно</a>
+    <div class="foot"><span>© Опора — демо-макет, вымышленный бренд</span><span>Не является медицинской услугой</span></div>
+  </div>
+</div>
+
+<script>
+/* ---------- скролл-режиссура: 4 кадра, кроссфейд + «залипание» ---------- */
+const cinema=document.getElementById('cinema');
+const frames=[...document.querySelectorAll('.frame')];
+const plates=[...document.querySelectorAll('.plate')];
+const bars=[...document.querySelectorAll('.rail b i')];
+const hint=document.getElementById('hint');
+const N=frames.length;
+
+/* каждая глава = HOLD (плашка стоит) + MOVE (перелёт в следующий кадр) */
+const HOLD=.55;
+
+function render(){
+  const r=cinema.getBoundingClientRect();
+  const total=cinema.offsetHeight-innerHeight;
+  const p=Math.min(1,Math.max(0,-r.top/total));   // 0..1 по всей сцене
+  const seg=1/N;
+
+  frames.forEach((f,i)=>{
+    const local=(p-i*seg)/seg;                     // 0..1 внутри своей главы
+    let o=0, s=1;
+    if(local>=0&&local<=1){
+      o = local<HOLD ? 1 : 1-(local-HOLD)/(1-HOLD);
+      s = 1+local*0.09;                            // медленный наезд камеры
+    } else if(local<0&&local>-.45){
+      o = 1+local/.45;                             // подхват от предыдущей
+    }
+    f.style.opacity=o.toFixed(3);
+    f.querySelector('.layer').style.transform=`scale(${s.toFixed(3)})`;
+    bars[i].style.transform=`scaleY(${Math.min(1,Math.max(0,local)).toFixed(3)})`;
+    plates[i].classList.toggle('on', local>.06&&local<HOLD+.18);
+  });
+  hint.classList.toggle('hide',p>.03);
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+/* ---------- звук: генерируем ambient прямо в браузере, без файлов ---------- */
+let actx,master,on=false;
+document.getElementById('sound').addEventListener('click',e=>{
+  const b=e.currentTarget;
+  if(!actx){
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    master=actx.createGain(); master.gain.value=0; master.connect(actx.destination);
+
+    // коричневый шум = «гул ветра»
+    const len=actx.sampleRate*4, buf=actx.createBuffer(1,len,actx.sampleRate), d=buf.getChannelData(0);
+    let last=0;
+    for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+.02*w)/1.02; d[i]=last*3.2}
+    const noise=actx.createBufferSource(); noise.buffer=buf; noise.loop=true;
+    const lp=actx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=.7;
+    noise.connect(lp).connect(master); noise.start();
+
+    // медленная «дыхательная» модуляция громкости
+    const lfo=actx.createOscillator(), lg=actx.createGain();
+    lfo.frequency.value=.07; lg.gain.value=340;
+    lfo.connect(lg).connect(lp.frequency); lfo.start();
+
+    // тихий дрон-обертон
+    const osc=actx.createOscillator(), og=actx.createGain();
+    osc.type='sine'; osc.frequency.value=58; og.gain.value=.05;
+    osc.connect(og).connect(master); osc.start();
+  }
+  on=!on;
+  actx.resume();
+  master.gain.cancelScheduledValues(actx.currentTime);
+  master.gain.linearRampToValueAtTime(on?.16:0, actx.currentTime+1.2);
+  b.setAttribute('aria-pressed',on);
+  b.textContent = on ? '♪ Звук вкл' : '♪ Звук';
+});
+</script>
+</body>
+</html>
