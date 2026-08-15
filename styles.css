@@ -54,7 +54,7 @@
 
   --ease:cubic-bezier(.22,1,.36,1);
   --breath:11s;                          /* вдох — пауза — выдох */
-  --air:clamp(70px,8vw,124px);
+  --air:clamp(54px,6vw,92px);
   --shell:min(1440px,calc(100% - clamp(1.5rem,7vw,7rem)));
   --shadow-soft:0 1px 2px rgba(31,29,26,.04),0 14px 34px -18px rgba(31,29,26,.2),
                 0 44px 90px -56px rgba(184,122,84,.4);
@@ -126,8 +126,10 @@ b,strong{font-weight:500}
 .btn svg{flex:0 0 auto}
 
 /* ================= ГЕРОЙ ================= */
-.hero{position:relative;min-height:100svh;display:flex;align-items:center;
-  padding:clamp(110px,14vh,150px) 0 clamp(70px,10vh,110px)}
+/* Высоту задаёт контент, а не экран: при 100svh на высоком мониторе снизу
+   оставалось до 480 px пустоты, через которую приходилось просто скроллить. */
+.hero{position:relative;min-height:min(78svh,700px);display:flex;align-items:center;
+  padding:clamp(96px,11vh,124px) 0 clamp(36px,4.5vh,60px)}
 /* width НЕ задаём: .hero-grid стоит на том же элементе, что и .wrap,
    и с равной специфичностью перебил бы ширину контейнера — текст уехал бы к краю */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);
@@ -158,7 +160,7 @@ b,strong{font-weight:500}
 /* свет позади: с каждой попыткой разгорается */
 .r-glow{position:absolute;width:135%;height:120%;pointer-events:none;filter:blur(46px);
   background:radial-gradient(closest-side,rgba(240,201,155,.92),rgba(232,186,132,.3) 56%,transparent 78%);
-  animation:r-glow-steps 15.3s ease-in-out infinite}
+  animation:r-glow-steps 9s ease-in-out infinite}
 @keyframes r-glow-steps{
   0%,4%{opacity:.28;transform:scale(.86)}
   30%,37%{opacity:.5;transform:scale(1)}
@@ -184,7 +186,7 @@ b,strong{font-weight:500}
 .r-top{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:18px}
 /* все три варианта лежат в одной ячейке грида — карточка не прыгает */
 .r-take,.r-score{display:grid}
-.r-take i,.r-score i{grid-area:1/1;font-style:normal;animation:r-swap 15.3s ease-in-out infinite}
+.r-take i,.r-score i{grid-area:1/1;font-style:normal;animation:r-swap 9s ease-in-out infinite}
 .r-take i{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--mut)}
 .r-score{justify-items:end}
@@ -195,7 +197,7 @@ b,strong{font-weight:500}
    иначе карточка прыгает при смене попытки. */
 .r-quote{display:grid;align-items:center;min-height:6.2em;margin-bottom:22px}
 .r-quote p{grid-area:1/1;font-family:var(--ser);font-style:italic;font-size:19px;line-height:1.42;
-  color:var(--ink);animation:r-swap 15.3s ease-in-out infinite}
+  color:var(--ink);animation:r-swap 9s ease-in-out infinite}
 
 /* фраза и подпись сменяются с мягким размытием, каждая держится ~6 с */
 @keyframes r-swap{
@@ -205,17 +207,17 @@ b,strong{font-weight:500}
   33%{opacity:0;transform:translateY(-7px);filter:blur(4px)}
   100%{opacity:0;transform:translateY(7px);filter:blur(4px)}
 }
-/* задержки — трети цикла: 15.3 / 3 = 5.1 с на попытку */
+/* задержки — трети цикла: 9 / 3 = 3 с на попытку */
 .r-take i:nth-child(1),.r-score i:nth-child(1),.r-quote p:nth-child(1){animation-delay:0s}
-.r-take i:nth-child(2),.r-score i:nth-child(2),.r-quote p:nth-child(2){animation-delay:-10.2s}
-.r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){animation-delay:-5.1s}
+.r-take i:nth-child(2),.r-score i:nth-child(2),.r-quote p:nth-child(2){animation-delay:-6s}
+.r-take i:nth-child(3),.r-score i:nth-child(3),.r-quote p:nth-child(3){animation-delay:-3s}
 
 /* семь критериев DEAR MAN: загораются по мере того, как ответ становится точнее */
 .r-segs{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
 .r-segs i{height:4px;background:var(--clay);opacity:.14}
-.r-segs .a{animation:seg-a 15.3s ease-in-out infinite}
-.r-segs .b{animation:seg-b 15.3s ease-in-out infinite}
-.r-segs .c{animation:seg-c 15.3s ease-in-out infinite}
+.r-segs .a{animation:seg-a 9s ease-in-out infinite}
+.r-segs .b{animation:seg-b 9s ease-in-out infinite}
+.r-segs .c{animation:seg-c 9s ease-in-out infinite}
 @keyframes seg-a{0%,3%{opacity:.14} 7%,96%{opacity:1} 100%{opacity:.14}}
 @keyframes seg-b{0%,36%{opacity:.14} 40%,96%{opacity:1} 100%{opacity:.14}}
 @keyframes seg-c{0%,69%{opacity:.14} 73%,96%{opacity:1} 100%{opacity:.14}}
@@ -266,7 +268,13 @@ h2 i{font-family:var(--ser);font-style:italic;font-weight:300;color:var(--clay);
 
 /* Залипание: трек задаёт длину прокрутки, сцена держится на месте,
    главы лежат в одной ячейке грида и сменяются кроссфейдом. */
-.journey.pinned .journey-track{height:340svh;position:relative}
+/* Сразу за «Зачем» идёт залипающая сцена — нижний отступ секции почти убран,
+   иначе между ними приходится скроллить пустоту. */
+#how{padding-bottom:clamp(16px,2.5vw,34px)}
+/* Верх залипающей сцены пустой по построению (глава центрирована в экране),
+   поэтому подтягиваем её вверх — пустота перекрывается, контент не сталкивается. */
+.journey.pinned{margin-top:clamp(-110px,-8vh,-50px)}
+.journey.pinned .journey-track{height:290svh;position:relative}
 .journey.pinned .journey-stage{position:sticky;top:0;height:100svh;display:flex;
   align-items:center;overflow:hidden}
 .journey.pinned .journey-inner{padding:0;width:var(--shell)}
