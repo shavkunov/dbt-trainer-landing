@@ -471,6 +471,27 @@ footer .bg{position:absolute;left:50%;bottom:-16%;width:100vw;height:78%;transfo
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
   outline:2px solid var(--clay-ink);outline-offset:3px}
 
+/* ---------- доводка прокрутки к началу раздела ----------
+   Браузер сам «проскакивает» границу между разделами, чтобы человек не
+   останавливался в пустоте между ними.
+
+   Режим proximity, а не mandatory: доводка срабатывает только вблизи границы,
+   а внутри длинного раздела прокрутка остаётся свободной. С mandatory страница
+   превратилась бы в слайдшоу и перехватывала бы каждое движение колеса.
+
+   Только мышь и только при включённой анимации: на тач-скролле с инерцией
+   доводка ощущается как рывок, а при reduced-motion она неуместна. */
+@media (min-width:981px) and (prefers-reduced-motion:no-preference) and (pointer:fine){
+  html{scroll-snap-type:y proximity}
+  .hero,#how,.journey,#demo,.band,#method,#diff,.safety,#faq,#join{
+    scroll-snap-align:start;
+    /* запас под фиксированную шапку, иначе лейбл раздела уходит под неё */
+    scroll-margin-top:8px}
+  /* Внутри залипающей сцены доводка не нужна — там прокрутка сама является
+     режиссурой, и точка притяжения мешала бы проходить главы. */
+  .journey.pinned .journey-track{scroll-snap-align:none}
+}
+
 /* ================= АДАПТИВ ================= */
 @media(max-width:1180px){
   .mods{grid-template-columns:repeat(2,1fr)}
